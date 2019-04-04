@@ -3,7 +3,7 @@ from erreurs import ErreurConsistance
 from collections import namedtuple
 
 _champs_article = ["code_d", "code_sap", "quantite", "unite", "type_prix", "type_rabais", "texte_sap", "intitule_long",
-                   "intitule_court", "eligible_U1", "eligible_U2", "eligible_U3"]
+                   "intitule_court"]
 Article = namedtuple("Article", _champs_article)
 
 
@@ -17,9 +17,8 @@ class Generaux(object):
     cles_obligatoires = ['centre', 'code_cfact_centre', 'origine', 'code_int', 'code_ext', 'commerciale', 'canal',
                          'secteur', 'devise', 'financier', 'fonds', 'entete', 'poste_emolument', 'poste_reservation',
                          'lien', 'chemin', 'chemin_propre', 'chemin_filigrane', 'code_t', 'code_n', 'code_ref_fact',
-                         'avantage_HC', 'annexe_cout', 'filtrer_article_nul', 'code_d', 'code_sap', 'quantite', 'unite',
-                         'type_prix', 'type_rabais', 'texte_sap', 'intitule_long', 'intitule_court', 'eligible_U1',
-                         'eligible_U2', 'eligible_U3', 'modes', 'min_fact_rese']
+                         'avantage_HC', 'filtrer_article_nul', 'code_d', 'code_sap', 'quantite', 'unite', 'type_prix',
+                         'type_rabais', 'texte_sap', 'intitule_long', 'intitule_court', 'modes', 'min_fact_rese']
     cles_autorisees = cles_obligatoires + ['code_sap_qas']
 
     def __init__(self, dossier_source, prod2qual=None):
@@ -85,14 +84,10 @@ class Generaux(object):
                 (len(self._donnees['code_d']) != len(self._donnees['type_prix'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['intitule_long'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['intitule_court'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['eligible_U1'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['eligible_U2'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['eligible_U3'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['type_rabais'])) or \
                 (len(self._donnees['code_d']) != len(self._donnees['texte_sap'])):
             erreurs += "le nombre de colonnes doit être le même pour le code D, le code SAP, la quantité, l'unité, " \
-                       "le type de prix, le type de rabais, le texte SAP, l'intitulé long, l'intitulé court, " \
-                       "l'éligible U1, l'éligible U2 et l'éligible U3\n"
+                       "le type de prix, le type de rabais, le texte SAP, l'intitulé long et l'intitulé court\n"
 
         if len(self._donnees['centre'][1]) > 70:
             erreurs += "le string du paramètre centre est trop long"
@@ -149,10 +144,6 @@ class Generaux(object):
     def avantage_hc_par_code_n(self, avantage_hc):
         return self._donnees['avantage_HC'][
             self._donnees['code_n'].index(avantage_hc)]
-
-    def annexe_cout_par_code_n(self, annexe_cout):
-        return self._donnees['annexe_cout'][
-            self._donnees['code_n'].index(annexe_cout)]
 
     def filtrer_article_nul_par_code_n(self, filtrer_article_nul):
         return self._donnees['filtrer_article_nul'][

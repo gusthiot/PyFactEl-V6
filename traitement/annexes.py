@@ -10,7 +10,7 @@ class Annexes(object):
     """
     @staticmethod
     def annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, paramannexe, generaux,
-                users, couts, docpdf):
+                users, categories, docpdf):
         """
         création des annexes
         :param sommes: sommes calculées
@@ -24,7 +24,7 @@ class Annexes(object):
         :param paramannexe: paramètres d'annexe
         :param generaux: paramètres généraux
         :param users: users importés
-        :param couts: catégories coûts importées
+        :param categories: catégories importées
         :param docpdf: paramètres d'ajout de document pdf
         """
 
@@ -38,7 +38,6 @@ class Annexes(object):
             client = clients.donnees[code_client]
             nature = Latex.echappe_caracteres(generaux.code_ref_par_code_n(client['nature']))
             av_hc = Latex.echappe_caracteres(generaux.avantage_hc_par_code_n(client['nature']))
-            an_couts = Latex.echappe_caracteres(generaux.annexe_cout_par_code_n(client['nature']))
             reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
             if edition.version > 0:
                 reference += "-" + str(edition.version)
@@ -57,7 +56,6 @@ class Annexes(object):
 
             contenu_projets = ""
             contenu_details = ""
-            contenu_interne = ""
 
             if code_client in sommes.sommes_comptes:
                 comptes_utilises = Outils.comptes_in_somme(sommes.sommes_comptes[code_client], comptes)
@@ -184,7 +182,7 @@ class Annexes(object):
 
                     contenu_projets += TablesAnnexes.table_prix_ja(sco, generaux)
                     contenu_projets += TablesAnnexes.table_prix_cae_jk(code_client, id_compte, intitule_compte, sco,
-                                                                       acces.sommes, couts)
+                                                                       acces.sommes, categories)
                     contenu_projets += TablesAnnexes.table_prix_lvr_jd(code_client, id_compte, intitule_compte, sco,
                                                                        livraisons.sommes, generaux)
                     if av_hc == "RABAIS":
@@ -197,22 +195,11 @@ class Annexes(object):
                                                             "Annexe facture")
                     contenu_details += Annexes.section(client, generaux, reference, ann_det_titre)
                     contenu_details += TablesAnnexes.table_tps_cae_jkmu(code_client, id_compte, intitule_compte, users,
-                                                                        machines, couts, acces)
+                                                                        machines, categories, acces)
                     if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
                         contenu_details += TablesAnnexes.table_qte_lvr_jdu(code_client, id_compte, intitule_compte,
                                                                            generaux, livraisons, users)
                     contenu_details += r'''\clearpage'''
-
-                    if an_couts == "OUI":
-                        contenu_interne += TablesAnnexes.table_cout_cae_jk(code_client, id_compte, intitule_compte, sco,
-                                                                           acces.sommes, couts)
-                        contenu_interne += TablesAnnexes.table_cout_ja(code_client, id_compte, generaux, sco,
-                                                                       livraisons.sommes)
-                        contenu_interne += TablesAnnexes.table_cout_cae_jkm(code_client, id_compte, intitule_compte,
-                                                                            couts, machines, acces.sommes)
-                        contenu_interne += TablesAnnexes.table_cout_lvr_jd(code_client, id_compte, intitule_compte, sco,
-                                                                           generaux, livraisons.sommes)
-                        contenu_interne += r'''\clearpage'''
 
                     # ## compte
 
@@ -319,37 +306,8 @@ class Annexes(object):
                     Latex.creer_latex_pdf(nom_pdf, contenu_annexe_interne_a)
                     pdfs_annexes['Annexe-interne'] = pieces
 
-            contenu_interne_b = ""
-            if an_couts == "OUI":
-                contenu_interne_b += Annexes.titre_annexe(client, edition, generaux, reference, "Coûts d'utilisation",
-                                                          "Annexe interne")
-                contenu_interne_b += Annexes.section(client, generaux, reference,
-                                                     "Annexe interne / Coûts d’utilisation")
-                contenu_interne_b += contenu_interne
-
-            contenu_interne_b += Annexes.titre_annexe(client, edition, generaux, reference, "Tableaux supplémentaires",
-                                                      "Annexe interne")
-            contenu_interne_b += Annexes.section(client, generaux, reference,
-                                                 "Annexe interne / Tableaux supplémentaires")
-            contenu_interne_b += TablesAnnexes.table_prix_xa(scl, generaux)
-            contenu_interne_b += TablesAnnexes.table_prix_xe(scl, client)
-            contenu_interne_b += TablesAnnexes.table_prix_cae_xj(code_client, scl, acces.sommes, client,
-                                                                 contenu_prix_cae_xj)
-            if not contenu_interne_b == "":
-                contenu_annexe_interne_b = Annexes.entete(edition)
-                contenu_annexe_interne_b += contenu_interne_b
-                contenu_annexe_interne_b += r'''\end{document}'''
-                nom_pdf = 'Annexe-interne' + suffixe
-                Latex.creer_latex_pdf(nom_pdf, contenu_annexe_interne_b)
-                if 'Annexe-interne' in pdfs_annexes:
-                    pdfs_annexes['Annexe-interne'].append(nom_pdf + ".pdf")
-                else:
-                    pdfs_annexes['Annexe-interne'] = [nom_pdf + ".pdf"]
-
             for donnee in paramannexe.donnees:
                 if donnee['nom'] in pdfs_annexes:
-                    if len(pdfs_annexes[donnee['nom']]) > 1:
-                        Latex.concatenation_pdfs(donnee['nom'] + suffixe, pdfs_annexes[donnee['nom']])
                     Latex.finaliser_pdf(donnee['nom'] + suffixe, donnee['chemin'])
             files = [f for f in os.listdir('.') if os.path.isfile(f)]
             for f in files:

@@ -96,14 +96,14 @@ class Acces(Fichier):
             return 1
         return 0
 
-    def calcul_montants(self, machines, categprix, clients, verification, couts, comptes):
+    def calcul_montants(self, machines, categprix, clients, verification, categories, comptes):
         """
         calcule les sous-totaux nécessaires
         :param machines: machines importées
         :param categprix: catégories prix importés et vérifiés
         :param clients: clients importés et vérifiés
         :param verification: pour vérifier si les dates et les cohérences sont correctes
-        :param couts: catégories coûts importées
+        :param categories: catégories importées
         :param comptes: comptes importés
 
         """
@@ -121,7 +121,7 @@ class Acces(Fichier):
             code_client = comptes.donnees[id_compte]['code_client']
             machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            prix = categprix.donnees[client['nature'] + machine['id_cout']]
+            prix = categprix.donnees[client['nature'] + machine['id_categorie']]
 
             if code_client not in self.sommes:
                 self.sommes[code_client] = {'comptes': {}, 'machines': {}}
@@ -189,33 +189,23 @@ class Acces(Fichier):
                 scat = self.sommes[code_client]['categories'][id_compte]
                 for id_machine in sco:
                     machine = machines.donnees[id_machine]
-                    id_cout = machine['id_cout']
-                    tm = sco[id_machine]['duree_hp'] / 60 + sco[id_machine]['duree_hc'] / 60
-                    tmo = sco[id_machine]['mo'] / 60
-                    sco[id_machine]['mu1'] = round(couts.donnees[id_cout]['U1'] * tm, 2)
-                    sco[id_machine]['mu2'] = round(couts.donnees[id_cout]['U2'] * tm, 2)
-                    sco[id_machine]['mu3'] = round(couts.donnees[id_cout]['U3'] * tm, 2)
-                    sco[id_machine]['mmo'] = round(couts.donnees[id_cout]['MO'] * tmo, 2)
+                    id_categorie = machine['id_categorie']
                     sco[id_machine]['mai_hp'] = round(sco[id_machine]['duree_hp'] / 60 * sco[id_machine]['pum'], 2)
                     sco[id_machine]['mai_hc'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['pum'], 2)
                     sco[id_machine]['moi'] = round(sco[id_machine]['mo'] / 60 * sco[id_machine]['puo'], 2)
                     sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['du_hc'], 2)
 
-                    if id_cout not in scat:
-                        scat[id_cout] = {'mu1': 0, 'mu2': 0, 'mu3': 0, 'mmo': 0, 'duree_hp': 0, 'duree_hc': 0, 'mo': 0,
+                    if id_categorie not in scat:
+                        scat[id_categorie] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0,
                                          'pum': sco[id_machine]['pum'],'puo': sco[id_machine]['puo']}
-                    scat[id_cout]['mu1'] += sco[id_machine]['mu1']
-                    scat[id_cout]['mu2'] += sco[id_machine]['mu2']
-                    scat[id_cout]['mu3'] += sco[id_machine]['mu3']
-                    scat[id_cout]['mmo'] += sco[id_machine]['mmo']
-                    scat[id_cout]['duree_hp'] += sco[id_machine]['duree_hp']
-                    scat[id_cout]['duree_hc'] += sco[id_machine]['duree_hc']
-                    scat[id_cout]['mo'] += sco[id_machine]['mo']
+                    scat[id_categorie]['duree_hp'] += sco[id_machine]['duree_hp']
+                    scat[id_categorie]['duree_hc'] += sco[id_machine]['duree_hc']
+                    scat[id_categorie]['mo'] += sco[id_machine]['mo']
 
-                for id_cout in scat:
-                    scat[id_cout]['duree'] = scat[id_cout]['duree_hp'] + scat[id_cout]['duree_hc']
-                    scat[id_cout]['mai'] = round(scat[id_cout]['duree'] / 60 * scat[id_cout]['pum'], 2)
-                    scat[id_cout]['moi'] = round(scat[id_cout]['mo'] / 60 * scat[id_cout]['puo'], 2)
+                for id_categorie in scat:
+                    scat[id_categorie]['duree'] = scat[id_categorie]['duree_hp'] + scat[id_categorie]['duree_hc']
+                    scat[id_categorie]['mai'] = round(scat[id_categorie]['duree'] / 60 * scat[id_categorie]['pum'], 2)
+                    scat[id_categorie]['moi'] = round(scat[id_categorie]['mo'] / 60 * scat[id_categorie]['puo'], 2)
 
 
     def acces_pour_compte(self, id_compte, code_client):

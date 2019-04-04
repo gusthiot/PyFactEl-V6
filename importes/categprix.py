@@ -8,18 +8,18 @@ class CategPrix(Fichier):
     """
 
     nom_fichier = "categprix.csv"
-    cles = ['nature', 'id_cat_cout', 'prix_h_mach_p', 'prix_h_mo_o']
+    cles = ['nature', 'id_categorie', 'prix_h_mach_p', 'prix_h_mo_o']
     libelle = "Catégories Prix"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def est_coherent(self, generaux, couts):
+    def est_coherent(self, generaux, categories):
         """
         vérifie que les données du fichier importé sont cohérentes,
         et efface les colonnes mois et année
         :param generaux: paramètres généraux
-        :param couts: catégories coûts importés
+        :param categories: catégories importées
         :return: 1 s'il y a une erreur, 0 sinon
         """
 
@@ -47,19 +47,19 @@ class CategPrix(Fichier):
                     msg += "la nature '" + donnee['nature'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            if donnee['id_cat_cout'] == "":
-                msg += "l'id cout " + str(ligne) + " ne peut être vide\n"
-            elif couts.contient_id(donnee['id_cat_cout']) == 0:
-                msg += "l'id cout de la ligne " + str(ligne) + " n'existe pas dans les catégories coûts\n"
-            elif donnee['id_cat_cout'] not in ids:
-                ids.append(donnee['id_cat_cout'])
+            if donnee['id_categorie'] == "":
+                msg += "l'id catégorie " + str(ligne) + " ne peut être vide\n"
+            elif categories.contient_id(donnee['id_categorie']) == 0:
+                msg += "l'id catégori de la ligne " + str(ligne) + " n'existe pas dans les catégories \n"
+            elif donnee['id_categorie'] not in ids:
+                ids.append(donnee['id_categorie'])
 
-            if (donnee['id_cat_cout'] != "") and (donnee['nature'] != ""):
-                couple = [donnee['id_cat_cout'], donnee['nature']]
+            if (donnee['id_categorie'] != "") and (donnee['nature'] != ""):
+                couple = [donnee['id_categorie'], donnee['nature']]
                 if couple not in couples:
                     couples.append(couple)
                 else:
-                    msg += "Couple id cout '" + donnee['id_cat_cout'] + "' et nature '" + \
+                    msg += "Couple id catégorie '" + donnee['id_categorie'] + "' et nature '" + \
                            donnee['nature'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
             donnee['prix_h_mach_p'], info = Outils.est_un_nombre(donnee['prix_h_mach_p'], "le prix horaire machine ",
@@ -70,7 +70,7 @@ class CategPrix(Fichier):
                                                                ligne)
             msg += info
 
-            donnees_dict[donnee['nature'] + donnee['id_cat_cout']] = donnee
+            donnees_dict[donnee['nature'] + donnee['id_categorie']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict
@@ -81,11 +81,11 @@ class CategPrix(Fichier):
                 msg += "La nature '" + code_n + "' dans les paramètres généraux n'est pas présente dans " \
                                                          "les catégories prix\n"
 
-        for id_cout in ids:
+        for id_cat in ids:
             for nature in natures:
-                couple = [id_cout, nature]
+                couple = [id_cat, nature]
                 if couple not in couples:
-                    msg += "Couple id cout '" + id_cout + "' et nature client '" + \
+                    msg += "Couple id catégorie '" + id_cat + "' et nature client '" + \
                            nature + "' n'existe pas\n"
 
         if msg != "":

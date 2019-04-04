@@ -10,8 +10,7 @@ class Sommes(object):
 
     cles_somme_compte = ['somme_j_mai', 'somme_j_mai_d', 'somme_j_moi', 'somme_j_moi_d', 'somme_j_dhi', 'somme_j_dhi_d',
                          'somme_j_mach_mai', 'somme_j_mach_mai_d', 'somme_j_mach_moi', 'somme_j_mach_moi_d',
-                         'somme_j_mm', 'somme_j_mr','somme_j_mb', 'c1', 'c2', 'mu1', 'mu2', 'mu3', 'mmo', 'mu1_d',
-                         'mu2_d', 'mu3_d', 'mmo_d']
+                         'somme_j_mm', 'somme_j_mr', 'somme_j_mb', 'c1', 'c2']
 
     cles_somme_client = ['mat', 'mot', 'dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em',
                          'er', 'e', 'res', 'rm', 'rm_d', 'rr', 'r']
@@ -99,16 +98,12 @@ class Sommes(object):
                 ac_som = acces.sommes[code_client]['comptes']
                 if id_compte in ac_som:
                     for id_machine, som in ac_som[id_compte].items():
-                        somme['mu1'] += som['mu1']
-                        somme['mu2'] += som['mu2']
-                        somme['mu3'] += som['mu3']
-                        somme['mmo'] += som['mmo']
                         somme['somme_j_mach_mai'] += som['mai_hp'] + som['mai_hc']
                         somme['somme_j_mach_moi'] += som['moi']
                         somme['somme_j_dhi'] += som['dhi']
                 ac_cat_som = acces.sommes[code_client]['categories']
                 if id_compte in ac_cat_som:
-                    for id_cout, cat_som in ac_cat_som[id_compte].items():
+                    for id_categorie, cat_som in ac_cat_som[id_compte].items():
                         somme['somme_j_mai'] += cat_som['mai']
                         somme['somme_j_moi'] += cat_som['moi']
 
@@ -174,22 +169,6 @@ class Sommes(object):
 
                     somme['tot_cat_x'][categorie] = somme['sommes_cat_m_x'][categorie]
                     somme['tot_cat_x'][categorie] -= somme['sommes_cat_r'][categorie]
-
-                mu1 = round(2 * somme['mu1'], 1) / 2
-                somme['mu1_d'] = mu1 - somme['mu1']
-                somme['mu1'] = mu1
-
-                mu2 = round(2 * somme['mu2'], 1) / 2
-                somme['mu2_d'] = mu2 - somme['mu2']
-                somme['mu2'] = mu2
-
-                mu3 = round(2 * somme['mu3'], 1) / 2
-                somme['mu3_d'] = mu3 - somme['mu3']
-                somme['mu3'] = mu3
-
-                mmo = round(2 * somme['mmo'], 1) / 2
-                somme['mmo_d'] = mmo - somme['mmo']
-                somme['mmo'] = mmo
 
                 somme['c1'] = somme['somme_j_mm']
                 somme['c2'] = somme['mj']

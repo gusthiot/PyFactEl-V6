@@ -24,8 +24,8 @@ class Detail(object):
 
             ligne = ["Année", "Mois", "Code Client Facture", "Code Client SAP", "Abrev. Labo", "type client",
                      "nature client", "Id-Compte", "Numéro de compte", "Intitulé compte", "Code Type Compte", "code_d",
-                     "Id-categ-cout", "Intitulé catégorie coût", "Durée machines (min)", "Durée main d'oeuvre (min)",
-                     "U1", "U2", "U3", "MO", "intitule_court", "N. prestation", "Intitulé", "Montant", "Rabais",
+                     "Id-categorie", "Intitulé catégorie", "Durée machines (min)", "Durée main d'oeuvre (min)",
+                     "-", "-", "-", "-", "intitule_court", "N. prestation", "Intitulé", "Montant", "Rabais",
                      "Catégorie Stock", "Affiliation"]
             fichier_writer.writerow(ligne)
 
@@ -33,7 +33,7 @@ class Detail(object):
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, couts, prestations):
+    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, categories, prestations):
         """
         génération des lignes de données du détail
         :param edition: paramètres d'édition
@@ -43,7 +43,7 @@ class Detail(object):
         :param acces: accès importés
         :param livraisons: livraisons importées
         :param comptes: comptes importés
-        :param couts: catégories coûts importées
+        :param categories: catégories importées
         :param prestations: prestations importées
         :return: lignes de données du détail
         """
@@ -69,20 +69,13 @@ class Detail(object):
 
                     if code_client in acces.sommes and id_compte in acces.sommes[code_client]['categories']:
                         som_cats = acces.sommes[code_client]['categories'][id_compte]
-                        for id_cout, som_cat in sorted(som_cats.items()):
+                        for id_categorie, som_cat in sorted(som_cats.items()):
                             duree = som_cat['duree_hp'] + som_cat['duree_hc']
-                            ligne = base_compte + ['M', id_cout, couts.donnees[id_cout]['intitule'], duree,
-                                                   som_cat['mo'], Outils.format_2_dec(som_cat['mu1']),
-                                                   Outils.format_2_dec(som_cat['mu2']),
-                                                   Outils.format_2_dec(som_cat['mu3']),
-                                                   Outils.format_2_dec(som_cat['mmo']), "", "", "", "", "", "", ""]
+                            ligne = base_compte + ['M', id_categorie, categories.donnees[id_categorie]['intitule'], duree,
+                                                   som_cat['mo'], 0, 0, 0, 0, "", "", "", "", "", "", ""]
                             lignes.append(ligne)
 
-                        ligne = base_compte + ['M', 'Arrondi', "", "", "",
-                                               Outils.format_2_dec(sclo[id_compte]['mu1_d']),
-                                               Outils.format_2_dec(sclo[id_compte]['mu2_d']),
-                                               Outils.format_2_dec(sclo[id_compte]['mu3_d']),
-                                               Outils.format_2_dec(sclo[id_compte]['mmo_d']), "", "", "", "", "", "",
+                        ligne = base_compte + ['M', 'Arrondi', "", "", "", 0, 0, 0, 0,  "", "", "", "", "", "",
                                                ""]
                         lignes.append(ligne)
 
@@ -91,12 +84,6 @@ class Detail(object):
 
                         for article in generaux.articles_d3:
                             if article.code_d in somme:
-                                elu1 = article.eligible_U1
-                                elu2 = article.eligible_U2
-                                elu3 = article.eligible_U3
-                                if elu1 == "NON" and elu2 == "NON" and elu3 == "NON":
-                                    continue
-
                                 for no_prestation, sip in sorted(somme[article.code_d].items()):
                                     prestation = prestations.prestation_de_num(no_prestation)
                                     ligne = base_compte + [article.code_d, "", "", "", "", "", "", "", "",

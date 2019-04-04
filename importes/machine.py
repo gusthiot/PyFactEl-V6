@@ -7,7 +7,7 @@ class Machine(Fichier):
     Classe pour l'importation des données de Machines Cmi
     """
 
-    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cout', 'tx_rabais_hc', 'tx_occ_eff_hp',
+    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_categorie', 'tx_rabais_hc', 'tx_occ_eff_hp',
             'tx_penalite_hp', 'tx_occ_eff_hc', 'tx_penalite_hc', 'delai_sans_frais']
     nom_fichier = "machine.csv"
     libelle = "Machines"
@@ -27,11 +27,11 @@ class Machine(Fichier):
                     return 1
         return 0
 
-    def est_coherent(self, couts):
+    def est_coherent(self, categories):
         """
         vérifie que les données du fichier importé sont cohérentes (id machine unique, id catégorie cout référencé,
         catégorie machine référencé dans les coefficients machines), et efface les colonnes mois et année
-        :param couts: catégories couts importés
+        :param categories: catégories importées
         :return: 1 s'il y a une erreur, 0 sinon
         """
         if self.verifie_date == 0:
@@ -57,10 +57,10 @@ class Machine(Fichier):
                 msg += "l'id machine '" + donnee['id_machine'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            if donnee['id_cout'] == "":
-                msg += "l'id catégorie cout de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif couts.contient_id(donnee['id_cout']) == 0:
-                msg += "l'id catégorie cout '" + donnee['id_cout'] + "' de la ligne " + str(ligne) \
+            if donnee['id_categorie'] == "":
+                msg += "l'id catégorie de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif categories.contient_id(donnee['id_categorie']) == 0:
+                msg += "l'id catégorie '" + donnee['id_categorie'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
             donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'],

@@ -41,7 +41,7 @@ class Verification(object):
         return verif
 
     def verification_coherence(self, generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
-                               livraisons, machines, prestations, reservations, couts, categprix, docpdf):
+                               livraisons, machines, prestations, reservations, categories, categprix, docpdf):
         """
         vérifie la cohérence des données importées
         :param generaux: paramètres généraux
@@ -56,7 +56,7 @@ class Verification(object):
         :param machines: machines importées
         :param prestations: prestations importées
         :param reservations: réservations importées
-        :param couts: catégories couts importées
+        :param categories: catégories importées
         :param categprix: catégories prix importées
         :param docpdf: paramètres d'ajout de document pdf
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
@@ -64,12 +64,12 @@ class Verification(object):
         verif = 0
         verif += acces.est_coherent(comptes, machines, users)
         verif += livraisons.est_coherent(comptes, prestations, users)
-        verif += couts.est_coherent()
+        verif += categories.est_coherent()
         verif += users.est_coherent()
-        verif += machines.est_coherent(couts)
+        verif += machines.est_coherent(categories)
         verif += prestations.est_coherent(generaux, coefprests)
         verif += emoluments.est_coherent(generaux)
-        verif += categprix.est_coherent(generaux, couts)
+        verif += categprix.est_coherent(generaux, categories)
         verif += coefprests.est_coherent(generaux)
         verif += clients.est_coherent(emoluments, generaux)
         verif += reservations.est_coherent(comptes, machines, users)

@@ -30,7 +30,7 @@ class TablesAnnexes(object):
 
             machines_reservees = Outils.machines_in_somme(somme, machines)
 
-            for id_cout, mics in sorted(machines_reservees.items()):
+            for id_categorie, mics in sorted(machines_reservees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
 
                     dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
@@ -136,7 +136,7 @@ class TablesAnnexes(object):
 
             machines_utilisees = Outils.machines_in_somme(scl['res'], machines)
 
-            for id_cout, mics in sorted(machines_utilisees.items()):
+            for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
                     re_hp = sommes_reservations[code_client][id_machine]['res_hp']
                     re_hc = sommes_reservations[code_client][id_machine]['res_hc']
@@ -241,7 +241,7 @@ class TablesAnnexes(object):
 
             machines_utilisees = Outils.machines_in_somme(scl['res'], machines)
 
-            for id_cout, mics in sorted(machines_utilisees.items()):
+            for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
                     re_somme = sommes_reservations[code_client][id_machine]
 
@@ -300,7 +300,7 @@ class TablesAnnexes(object):
             somme = sommes_acces[code_client]['machines']
             machines_utilisees = Outils.machines_in_somme(somme, machines)
 
-            for id_cout, mics in sorted(machines_utilisees.items()):
+            for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
                     if id_machine in scl['res']:
                         pur_hp = somme[id_machine]['pur_hp']
@@ -382,124 +382,6 @@ class TablesAnnexes(object):
             return Latex.tableau(contenu, structure, legende)
         else:
             return ""
-
-    @staticmethod
-    def table_prix_cae_xj(code_client, scl, sommes_acces, client, contenu_prix_cae_xj):
-        """
-        Prix CAE X/J - Table Client Récap Procédés/Compte
-        :param code_client: code du client concerné
-        :param scl: sommes client calculées
-        :param sommes_acces: sommes des accès importés
-        :param client: données client
-        :param contenu_prix_cae_xj: contenu généré de la table
-        :return: table au format latex
-        """
-
-        if code_client in sommes_acces:
-            structure = r'''{|l|l|r|r|r|r|r|r|}'''
-            legende = r'''Récapitulatif des procédés'''
-
-            contenu = r'''
-                \cline{3-8}
-                \multicolumn{2}{c}{} & \multicolumn{2}{|c|}{Procédés} & \multicolumn{1}{c|}{Rabais}
-                & \multicolumn{2}{c|}{Facture} & Montant \\
-                \cline{1-7}
-                Projet & Type & Machine & M.O. opér. & Déduc. HC & Montant & Rabais & \multicolumn{1}{c|}{net} \\
-                \hline
-                '''
-
-            contenu += contenu_prix_cae_xj
-
-            rht = client['rh'] * scl['dht']
-            dico = {'mat': Outils.format_2_dec(scl['mat']), 'mr': Outils.format_2_dec(scl['somme_t_mr']),
-                    'mm': Outils.format_2_dec(scl['somme_t_mm']), 'mot': Outils.format_2_dec(scl['mot']),
-                    'mt': Outils.format_2_dec(scl['mt']), 'rht': Outils.format_2_dec(rht)}
-            contenu += r'''
-                Total & & %(mat)s & %(mot)s & %(rht)s & %(mm)s & %(mr)s & %(mt)s \\
-                \hline
-                ''' % dico
-
-            return Latex.long_tableau(contenu, structure, legende)
-        else:
-            return ""
-
-    @staticmethod
-    def table_prix_xe(scl, client):
-        """
-        Prix XE - Table Client Emolument
-        :param scl: sommes client calculées
-        :param client: données client
-        :return: table au format latex
-        """
-
-        structure = r'''{|r|r|r|r|}'''
-        legende = r'''Émolument mensuel'''
-
-        dico = {'emb':  Outils.format_2_dec(client['emb']), 'tot': Outils.format_2_dec(scl['mt']),
-                'rabais': Outils.format_2_dec(scl['er']), 'emo': scl['e']}
-
-        contenu = r'''
-            \hline
-            \multicolumn{1}{|l|}{Émolument de base}
-            & \multicolumn{1}{l|}{Total Procédés} &
-            \multicolumn{1}{l|}{Rabais émolument} & \multicolumn{1}{l|}{Émolument} \\
-            \hline
-            %(emb)s & %(tot)s & %(rabais)s & %(emo)s \\
-            \hline
-            ''' % dico
-
-        return Latex.tableau(contenu, structure, legende)
-
-    @staticmethod
-    def table_prix_xa(scl, generaux):
-        """
-        Prix XA - Table Client Récap Articles
-        :param scl: sommes client calculées
-        :param generaux: paramètres généraux
-        :return: table au format latex
-        """
-
-        structure = r'''{|l|r|r|r|}'''
-        legende = r'''Récapitulatif des articles'''
-
-        dico = {'emom': Outils.format_2_dec(scl['em']), 'emor': Outils.format_2_dec(scl['er']),
-                'emo': Outils.format_2_dec(scl['e']), 'resm': Outils.format_2_dec(scl['rm']),
-                'resr': Outils.format_2_dec(scl['rr']), 'res': Outils.format_2_dec(scl['r']),
-                'int_emo': Latex.echappe_caracteres(generaux.articles[0].intitule_long),
-                'int_res': Latex.echappe_caracteres(generaux.articles[1].intitule_long),
-                'int_proc': Latex.echappe_caracteres(generaux.articles[2].intitule_long),
-                'mm': Outils.format_2_dec(scl['somme_t_mm']),
-                'mr': Outils.format_2_dec(scl['somme_t_mr']), 'mt': Outils.format_2_dec(scl['mt'])}
-
-        contenu = r'''
-            \cline{2-4}
-            \multicolumn{1}{l|}{} & \multicolumn{1}{c|}{Montant} & \multicolumn{1}{c|}{Rabais}
-            & \multicolumn{1}{c|}{Total} \\
-            \hline
-            %(int_emo)s & %(emom)s & %(emor)s & %(emo)s \\
-            \hline
-            %(int_res)s & %(resm)s & %(resr)s & %(res)s \\
-            \hline
-            %(int_proc)s & %(mm)s & %(mr)s & %(mt)s \\
-            \hline
-            ''' % dico
-
-        for article in generaux.articles_d3:
-            dico = {'intitule': Latex.echappe_caracteres(article.intitule_long),
-                    'mm': Outils.format_2_dec(scl['sommes_cat_m'][article.code_d]),
-                    'mr': Outils.format_2_dec(scl['sommes_cat_r'][article.code_d]),
-                    'mj': Outils.format_2_dec(scl['tot_cat'][article.code_d])}
-            contenu += r'''
-                %(intitule)s & %(mm)s  & %(mr)s & %(mj)s \\
-                \hline
-                ''' % dico
-
-        contenu += r'''\multicolumn{3}{|r|}{Total}
-            & ''' + Outils.format_2_dec(scl['somme_t']) + r'''\\
-            \hline
-            '''
-
-        return Latex.tableau(contenu, structure, legende)
 
     @staticmethod
     def table_prix_bonus_xj(code_client, scl, sommes_acces, contenu_prix_bonus_xj):
@@ -716,7 +598,7 @@ class TablesAnnexes(object):
         return Latex.long_tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_tps_cae_jkmu(code_client, id_compte, intitule_compte, users, machines, couts, acces):
+    def table_tps_cae_jkmu(code_client, id_compte, intitule_compte, users, machines, categories, acces):
         """
         Tps CAE J/K/M/U - Table Compte Détail Temps CAE/Catégorie Machine/Machine/User
         :param code_client: code du client concerné
@@ -724,7 +606,7 @@ class TablesAnnexes(object):
         :param intitule_compte: intitulé du compte concerné
         :param users: users importés
         :param machines: machines importées
-        :param couts: catégories coûts importées
+        :param categories: catégories importées
         :param acces: accès importés
         :return: table au format latex
         """
@@ -747,13 +629,13 @@ class TablesAnnexes(object):
 
             machines_utilisees = Outils.machines_in_somme(somme, machines)
 
-            for id_cout, mics in sorted(machines_utilisees.items()):
-                dico_cat = {'hp': Outils.format_heure(som_cat[id_cout]['duree_hp']),
-                            'hc': Outils.format_heure(som_cat[id_cout]['duree_hc']),
-                            'mo': Outils.format_heure(som_cat[id_cout]['mo'])}
+            for id_categorie, mics in sorted(machines_utilisees.items()):
+                dico_cat = {'hp': Outils.format_heure(som_cat[id_categorie]['duree_hp']),
+                            'hc': Outils.format_heure(som_cat[id_categorie]['duree_hc']),
+                            'mo': Outils.format_heure(som_cat[id_categorie]['mo'])}
                 contenu += r'''
                     \multicolumn{3}{|l|}
-                    {\textbf{''' + Latex.echappe_caracteres(couts.donnees[id_cout]['intitule']) + r'''}} &
+                    {\textbf{''' + Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']) + r'''}} &
                      \hspace{5mm} %(hp)s & \hspace{5mm} %(hc)s &
                      \hspace{5mm} %(mo)s \\
                     \hline''' % dico_cat
@@ -825,221 +707,6 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_cout_lvr_jd(code_client, id_compte, intitule_compte, sco, generaux, sommes_livraisons):
-        """
-        Coût LVR J/D - Table Compte Récap Coûts Prestations livrées/code D
-        :param code_client: code du client concerné
-        :param id_compte: id du compte concerné
-        :param intitule_compte: intitulé du compte concerné
-        :param sco: sommes compte calculées
-        :param generaux: paramètres généraux
-        :param sommes_livraisons: sommes des livraisons importées
-        :return: table au format latex
-        """
-
-        contenu = ""
-        structure = r'''{|l|r|c|r|r|r|r|}'''
-        legende = r'''Coûts des prestations livrées'''
-        if code_client in sommes_livraisons and id_compte in sommes_livraisons[code_client]:
-            somme = sommes_livraisons[code_client][id_compte]
-            for article in generaux.articles_d3:
-                if article.code_d in somme:
-                    elu1 = article.eligible_U1
-                    elu2 = article.eligible_U2
-                    elu3 = article.eligible_U3
-                    if elu1 == "NON" and elu2 == "NON" and elu3 == "NON":
-                        continue
-
-                    if contenu != "":
-                        contenu += r'''
-                            \multicolumn{7}{c}{} \\
-                            '''
-
-                    contenu += r'''
-                        \hline
-                        \multicolumn{1}{|l|}{
-                        \textbf{''' + intitule_compte + " - " + Latex.echappe_caracteres(article.intitule_long) + r'''
-                        }} & \multicolumn{1}{c|}{Quantité} & Unité & \multicolumn{1}{c|}{P.U.}
-                        & \multicolumn{1}{c|}{Montant} & \multicolumn{1}{c|}{Rabais}
-                        & \multicolumn{1}{c|}{Net} \\
-                        \hline
-                        '''
-                    for no_prestation, sip in sorted(somme[article.code_d].items()):
-                        dico = {'nom': Latex.echappe_caracteres(sip['nom']), 'num': no_prestation,
-                                'quantite': "%.1f" % sip['quantite'], 'unite': Latex.echappe_caracteres(sip['unite']),
-                                'pux': Outils.format_2_dec(sip['pux']),
-                                'montantx': Outils.format_2_dec(sip['montantx']),
-                                'rabais': Outils.format_2_dec(sip['rabais']),
-                                'netx': Outils.format_2_dec((sip['montantx'] - sip['rabais']))}
-                        contenu += r'''
-                            %(num)s - %(nom)s & \hspace{5mm} %(quantite)s & %(unite)s & %(pux)s & 
-                            %(montantx)s & %(rabais)s & %(netx)s \\
-                            \hline
-                            ''' % dico
-                    dico = {'montantx_d': Outils.format_2_dec(sco['sommes_cat_m_x_d'][article.code_d]),
-                            'rabais_d': Outils.format_2_dec(sco['sommes_cat_r_d'][article.code_d]),
-                            'montantx': Outils.format_2_dec(sco['sommes_cat_m_x'][article.code_d]),
-                            'rabais': Outils.format_2_dec(sco['sommes_cat_r'][article.code_d]),
-                            'netx': Outils.format_2_dec(sco['tot_cat_x'][article.code_d])}
-
-                    contenu += r'''
-                        \multicolumn{4}{|r|}{Arrondi} & %(montantx_d)s & %(rabais_d)s & \\
-                        \hline
-                        \multicolumn{4}{|r|}{Total} & %(montantx)s & %(rabais)s & %(netx)s \\
-                        \hline
-                        ''' % dico
-        if contenu != "":
-            return Latex.tableau(contenu, structure, legende)
-        else:
-            return ""
-
-    @staticmethod
-    def table_cout_cae_jkm(code_client, id_compte, intitule_compte, couts, machines, sommes_acces):
-        """
-        Coût CAE J/K/M - Table Compte Récap Coûts Procédés/Catégorie Machine/Machine
-        :param code_client: code du client concerné
-        :param id_compte: id du compte concerné
-        :param intitule_compte: intitulé du compte concerné
-        :param couts: catégories coûts importées
-        :param machines: machines importées
-        :param sommes_acces: sommes des accès importés
-        :return: table au format latex
-        """
-
-        if code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes']:
-            structure = r'''{|l|c|c|r|r|r|r|r|r|r|r|}'''
-            legende = r'''Coûts d'utilisation des machines et main d'oeuvre par catégorie'''
-            contenu = ""
-
-            somme = sommes_acces[code_client]['comptes'][id_compte]
-            som_cat = sommes_acces[code_client]['categories'][id_compte]
-            machines_utilisees = Outils.machines_in_somme(somme, machines)
-
-            for id_cout, mics in sorted(machines_utilisees.items()):
-                if contenu != "":
-                    contenu += r'''
-                        \multicolumn{7}{c}{} \\
-                        '''
-
-                contenu += r'''
-                    \hline
-                    \textbf{''' + intitule_compte + r'''} & \multicolumn{2}{c|}{Durée}
-                    & \multicolumn{4}{c|}{PU [CHF/h]} & \multicolumn{4}{c|}{Montant [CHF]} \\
-                    \hline
-                    \textbf{''' + Latex.echappe_caracteres(couts.donnees[id_cout]['intitule']) + r'''}
-                    & Mach. & Oper. & \multicolumn{1}{c|}{U1} & \multicolumn{1}{c|}{U2}
-                    & \multicolumn{1}{c|}{U3} & \multicolumn{1}{c|}{Oper.} & \multicolumn{1}{c|}{U1}
-                    & \multicolumn{1}{c|}{U2} & \multicolumn{1}{c|}{U3} & \multicolumn{1}{c|}{Oper.} \\
-                    \hline
-                    '''
-
-                for nom_machine, id_machine in sorted(mics.items()):
-                    duree = somme[id_machine]['duree_hp'] + somme[id_machine]['duree_hc']
-
-                    dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
-                                    'duree': Outils.format_heure(duree),
-                                    'mo': Outils.format_heure(somme[id_machine]['mo']),
-                                    'cu1': Outils.format_2_dec(couts.donnees[id_cout]['U1']),
-                                    'cu2': Outils.format_2_dec(couts.donnees[id_cout]['U2']),
-                                    'cu3': Outils.format_2_dec(couts.donnees[id_cout]['U3']),
-                                    'cmo': Outils.format_2_dec(couts.donnees[id_cout]['MO']),
-                                    'mu1': Outils.format_2_dec(somme[id_machine]['mu1']),
-                                    'mu2': Outils.format_2_dec(somme[id_machine]['mu2']),
-                                    'mu3': Outils.format_2_dec(somme[id_machine]['mu3']),
-                                    'mmo': Outils.format_2_dec(somme[id_machine]['mmo'])}
-                    contenu += r'''
-                        %(machine)s & %(duree)s & %(mo)s & %(cu1)s & %(cu2)s & %(cu3)s & %(cmo)s & %(mu1)s
-                        & %(mu2)s & %(mu3)s & %(mmo)s \\
-                        \hline
-                        ''' % dico_machine
-
-                dico_cat = {'mu1': Outils.format_2_dec(som_cat[id_cout]['mu1']),
-                            'mu2': Outils.format_2_dec(som_cat[id_cout]['mu2']),
-                            'mu3': Outils.format_2_dec(som_cat[id_cout]['mu3']),
-                            'mmo': Outils.format_2_dec(som_cat[id_cout]['mmo'])}
-
-                contenu += r'''
-                    \multicolumn{7}{|r|}{Total} & %(mu1)s & %(mu2)s & %(mu3)s & %(mmo)s \\
-                    \hline
-                    ''' % dico_cat
-
-            return Latex.long_tableau(contenu, structure, legende)
-
-        else:
-            return ""
-
-    @staticmethod
-    def table_cout_ja(code_client, id_compte, generaux, sco, sommes_livraisons):
-        """
-        Coût JA - Table Compte Récap  Articles
-        :param code_client: code du client concerné
-        :param id_compte: id du compte concerné
-        :param generaux: paramètres généraux
-        :param sco: sommes compte calculées
-        :param sommes_livraisons: sommes des livraisons importées
-        :return: table au format latex
-        """
-
-        structure = r'''{|l|r|r|r|}'''
-        legende = r'''Coûts d'utilisation '''
-
-        dico = {'mu1': Outils.format_2_dec(sco['mu1']), 'mu2': Outils.format_2_dec(sco['mu2']),
-                'mu3': Outils.format_2_dec(sco['mu3']), 'mmo': Outils.format_2_dec(sco['mmo'])}
-        tot1 = sco['mu1'] + sco['mmo']
-        tot2 = sco['mu2'] + sco['mmo']
-        tot3 = sco['mu3'] + sco['mmo']
-
-        contenu = r'''
-            \cline{2-4}
-            \multicolumn{1}{l|}{} & \multicolumn{1}{c|}{1} & \multicolumn{1}{c|}{2} & 
-            \multicolumn{1}{c|}{3} \\
-            \hline
-            Coûts d'utilisation machine & %(mu1)s & %(mu2)s & %(mu3)s \\
-            \hline
-            Coûts main d'oeuvre opérateur & %(mmo)s & %(mmo)s & %(mmo)s \\
-            \hline
-            ''' % dico
-
-        if code_client in sommes_livraisons and id_compte in sommes_livraisons[code_client]:
-            somme = sommes_livraisons[code_client][id_compte]
-            for article in generaux.articles_d3:
-                if article.code_d in somme:
-                    elu1 = article.eligible_U1
-                    elu2 = article.eligible_U2
-                    elu3 = article.eligible_U3
-                    if elu1 == "NON" and elu2 == "NON" and elu3 == "NON":
-                        continue
-                    netx = sco['tot_cat_x'][article.code_d]
-                    u1 = 0
-                    u2 = 0
-                    u3 = 0
-                    if elu1 == "OUI":
-                        u1 = netx
-                    if elu2 == "OUI":
-                        u2 = netx
-                    if elu3 == "OUI":
-                        u3 = netx
-                    tot1 += u1
-                    tot2 += u2
-                    tot3 += u3
-                    dico_article = {'intitule': Latex.echappe_caracteres(article.intitule_long),
-                                    'u1': Outils.format_2_dec(u1),
-                                    'u2': Outils.format_2_dec(u2), 'u3': Outils.format_2_dec(u3)}
-                    contenu += r'''
-                        %(intitule)s & %(u1)s & %(u2)s & %(u3)s \\
-                        \hline
-                        ''' % dico_article
-
-        dico_tot = {'tot1': Outils.format_2_dec(tot1), 'tot2': Outils.format_2_dec(tot2),
-                    'tot3': Outils.format_2_dec(tot3)}
-        contenu += r'''
-            \multicolumn{1}{|r|}{Total} & %(tot1)s & %(tot2)s & %(tot3)s \\
-            \hline
-            ''' % dico_tot
-
-        return Latex.tableau(contenu, structure, legende)
-
-    @staticmethod
     def table_prix_cae_jm(code_client, id_compte, intitule_compte, sco, sommes_acces, machines, av_hc):
         """
         Prix CAE J/M - Table Compte Récap Procédés/Machine
@@ -1072,7 +739,7 @@ class TablesAnnexes(object):
 
             machines_utilisees = Outils.machines_in_somme(somme, machines)
 
-            for id_cout, mics in sorted(machines_utilisees.items()):
+            for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom, id_machine in sorted(mics.items()):
                     dico_machine = {'machine': Latex.echappe_caracteres(nom),
                                     'hp': Outils.format_heure(somme[id_machine]['duree_hp']),
@@ -1139,66 +806,6 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_cout_cae_jk(code_client, id_compte, intitule_compte, sco, sommes_acces, couts):
-        """
-        Coût CAE J/K - Table Compte Récap Procédés/Catégorie Machine
-        :param code_client: code du client concerné
-        :param id_compte: id du compte concerné
-        :param intitule_compte: intitulé du compte concerné
-        :param sco: sommes compte calculées
-        :param sommes_acces: sommes des accès importés
-        :param couts: catégories coûts importées
-        :return: table au format latex
-        """
-
-        if code_client in sommes_acces and id_compte in sommes_acces[code_client]['categories']:
-            structure = r'''{|l|r|r|r|r|}'''
-            legende = r'''Coûts d'utilisation des machines et main d'oeuvre'''
-            contenu = r'''
-                    \hline
-                    \multirow{2}{*}{\textbf{''' + intitule_compte + r'''}}
-                    & \multicolumn{4}{c|}{Montant [CHF]} \\
-                    \cline{2-5}
-                     & \multicolumn{1}{c|}{U1} & \multicolumn{1}{c|}{U2} & \multicolumn{1}{c|}{U3}
-                     & \multicolumn{1}{c|}{M.O. Oper.} \\
-                    \hline
-                    '''
-
-            som_cats = sommes_acces[code_client]['categories'][id_compte]
-
-            for id_cout, som_cat in sorted(som_cats.items()):
-                dico_cat = {'intitule': Latex.echappe_caracteres(couts.donnees[id_cout]['intitule']),
-                            'mu1': Outils.format_2_dec(som_cat['mu1']),
-                            'mu2': Outils.format_2_dec(som_cat['mu2']),
-                            'mu3': Outils.format_2_dec(som_cat['mu3']),
-                            'mmo': Outils.format_2_dec(som_cat['mmo'])}
-
-                contenu += r'''
-                    %(intitule)s & %(mu1)s & %(mu2)s & %(mu3)s & %(mmo)s \\
-                    \hline
-                    ''' % dico_cat
-
-            dico_compte = {'mu1_d': Outils.format_2_dec(sco['mu1_d']),
-                           'mu2_d': Outils.format_2_dec(sco['mu2_d']),
-                           'mu3_d': Outils.format_2_dec(sco['mu3_d']),
-                           'mmo_d': Outils.format_2_dec(sco['mmo_d']),
-                           'mu1': Outils.format_2_dec(sco['mu1']),
-                           'mu2': Outils.format_2_dec(sco['mu2']),
-                           'mu3': Outils.format_2_dec(sco['mu3']),
-                           'mmo': Outils.format_2_dec(sco['mmo'])}
-
-            contenu += r'''
-                \multicolumn{1}{|r|}{Arrondi} & %(mu1_d)s & %(mu2_d)s & %(mu3_d)s & %(mmo_d)s \\
-                \hline
-                \multicolumn{1}{|r|}{Total} & %(mu1)s & %(mu2)s & %(mu3)s & %(mmo)s \\
-                \hline
-                ''' % dico_compte
-
-            return Latex.tableau(contenu, structure, legende)
-        else:
-            return ""
-
-    @staticmethod
     def table_prix_avtg_jm(code_client, id_compte, intitule_compte, sco, sommes_acces, machines, av_hc):
         """
         Prix Avtg J/M - Table Compte Avantage HC (Rabais ou Bonus) par Machine
@@ -1229,7 +836,7 @@ class TablesAnnexes(object):
 
             machines_utilisees = Outils.machines_in_somme(somme, machines)
 
-            for id_cout, mics in sorted(machines_utilisees.items()):
+            for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom, id_machine in sorted(mics.items()):
                     if somme[id_machine]['duree_hc'] > 0:
                         dico = {'machine': Latex.echappe_caracteres(nom),
@@ -1315,7 +922,7 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_prix_cae_jk(code_client, id_compte, intitule_compte, sco, sommes_acces, couts):
+    def table_prix_cae_jk(code_client, id_compte, intitule_compte, sco, sommes_acces, categories):
         """
         Prix CAE J/K - Table Compte Récap Procédés/Catégorie Machine
         :param code_client: code du client concerné
@@ -1323,7 +930,7 @@ class TablesAnnexes(object):
         :param intitule_compte: intitulé du compte concerné
         :param sco: sommes compte calculées
         :param sommes_acces: sommes des accès importés
-        :param couts: catégories coûts importées
+        :param categories: catégories importées
         :return: table au format latex
         """
 
@@ -1344,14 +951,14 @@ class TablesAnnexes(object):
 
             som_cat = sommes_acces[code_client]['categories'][id_compte]
 
-            for id_cout, cats in sorted(som_cat.items()):
-                dico_cat = {'intitule': Latex.echappe_caracteres(couts.donnees[id_cout]['intitule']),
-                            'duree': Outils.format_heure(som_cat[id_cout]['duree']),
-                            'mo': Outils.format_heure(som_cat[id_cout]['mo']),
-                            'pum': Outils.format_2_dec(som_cat[id_cout]['pum']),
-                            'puo': Outils.format_2_dec(som_cat[id_cout]['puo']),
-                            'mai': Outils.format_2_dec(som_cat[id_cout]['mai']),
-                            'moi': Outils.format_2_dec(som_cat[id_cout]['moi'])}
+            for id_categorie, cats in sorted(som_cat.items()):
+                dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
+                            'duree': Outils.format_heure(som_cat[id_categorie]['duree']),
+                            'mo': Outils.format_heure(som_cat[id_categorie]['mo']),
+                            'pum': Outils.format_2_dec(som_cat[id_categorie]['pum']),
+                            'puo': Outils.format_2_dec(som_cat[id_categorie]['puo']),
+                            'mai': Outils.format_2_dec(som_cat[id_categorie]['mai']),
+                            'moi': Outils.format_2_dec(som_cat[id_categorie]['moi'])}
                 contenu += r'''
                     %(intitule)s & %(duree)s & %(mo)s & %(pum)s & %(puo)s & %(mai)s & %(moi)s  \\
                     \hline
@@ -1451,7 +1058,7 @@ class TablesAnnexes(object):
             somme = sommes_acces[code_client]['comptes'][id_compte]
             machines_utilisees = Outils.machines_in_somme(somme, machines)
 
-            for id_cout, mics in sorted(machines_utilisees.items()):
+            for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
                     if somme[id_machine]['dhi'] > 0:
                         dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
@@ -1514,7 +1121,7 @@ class TablesAnnexes(object):
             somme = sommes_acces[code_client]['machines']
             machines_utilisees = Outils.machines_in_somme(somme, machines)
 
-            for id_cout, mics in sorted(machines_utilisees.items()):
+            for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
                     if somme[id_machine]['dhm'] > 0:
                         dico_machine = {'machine': Latex.echappe_caracteres(nom_machine),
@@ -1578,7 +1185,7 @@ class TablesAnnexes(object):
 
             machines_reservees = Outils.machines_in_somme(somme, machines)
 
-            for id_cout, mics in sorted(machines_reservees.items()):
+            for id_categorie, mics in sorted(machines_reservees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
                     scm = scl['res'][id_machine]
                     contenu_hp = ""

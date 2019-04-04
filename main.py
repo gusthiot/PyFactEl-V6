@@ -26,7 +26,7 @@ from importes import (Client,
                       Machine,
                       Prestation,
                       Reservation,
-                      Couts,
+                      Categorie,
                       User,
                       DossierSource,
                       DossierDestination)
@@ -160,7 +160,7 @@ if pe_present:
     machines = Machine(dossier_source)
     prestations = Prestation(dossier_source)
     reservations = Reservation(dossier_source)
-    couts = Couts(dossier_source)
+    categories = Categorie(dossier_source)
     users = User(dossier_source)
 
     verification = Verification()
@@ -170,13 +170,13 @@ if pe_present:
         sys.exit("Erreur dans les dates")
 
     if verification.verification_coherence(generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
-                                           livraisons, machines, prestations, reservations, couts, categprix,
+                                           livraisons, machines, prestations, reservations, categories, categprix,
                                            docpdf) > 0:
         sys.exit("Erreur dans la cohérence")
 
     livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
     reservations.calcul_montants(machines, categprix, clients, comptes, verification)
-    acces.calcul_montants(machines, categprix, clients, verification, couts, comptes)
+    acces.calcul_montants(machines, categprix, clients, verification, categories, comptes)
 
     sommes = Sommes(verification, generaux)
     sommes.calculer_toutes(livraisons, reservations, acces, clients, machines)
@@ -189,7 +189,7 @@ if pe_present:
     # faire les annexes avant la facture, que le ticket puisse vérifier leur existence
     if Latex.possibles():
         Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, paramannexe,
-                        generaux, users, couts, docpdf)
+                        generaux, users, categories, docpdf)
 
     Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
     Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
@@ -208,11 +208,11 @@ if pe_present:
     BilanMensuel.bilan(dossier_destination, edition, generaux, bm_lignes)
     bc_lignes = BilanComptes.creation_lignes(edition, sommes, clients, generaux, comptes)
     BilanComptes.bilan(dossier_destination, edition, generaux, bc_lignes)
-    det_lignes = Detail.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, couts,
+    det_lignes = Detail.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, categories,
                                         prestations)
     Detail.detail(dossier_destination, edition, det_lignes)
 
-    cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines, couts)
+    cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines, categories)
     Recapitulatifs.cae(dossier_destination, edition, cae_lignes)
     lvr_lignes = Recapitulatifs.lvr_lignes(edition, livraisons, comptes, clients, users, prestations)
     Recapitulatifs.lvr(dossier_destination, edition, lvr_lignes)
@@ -221,7 +221,7 @@ if pe_present:
 
     for fichier in [acces.nom_fichier, clients.nom_fichier, emoluments.nom_fichier, coefprests.nom_fichier,
                     comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
-                    reservations.nom_fichier, couts.nom_fichier, users.nom_fichier, generaux.nom_fichier,
+                    reservations.nom_fichier, categories.nom_fichier, users.nom_fichier, generaux.nom_fichier,
                     edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier]:
         dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
     if docpdf is not None:

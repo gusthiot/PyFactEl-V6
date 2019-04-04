@@ -33,7 +33,7 @@ class Recapitulatifs(object):
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def cae_lignes(edition, acces, comptes, clients, users, machines, couts):
+    def cae_lignes(edition, acces, comptes, clients, users, machines, categories):
         """
         génération des lignes de données du récapitulatif des accès machines
         :param edition: paramètres d'édition
@@ -42,7 +42,7 @@ class Recapitulatifs(object):
         :param clients: clients importés
         :param users: users importés
         :param machines: machines importées
-        :param couts: catégories coûts importées
+        :param categories: catégories importées
         :return: lignes de données du récapitulatif
         """
         lignes = []
@@ -52,11 +52,11 @@ class Recapitulatifs(object):
             user = users.donnees[donnee['id_user']]
             op = users.donnees[donnee['id_op']]
             machine = machines.donnees[donnee['id_machine']]
-            id_cout = machine['id_cout']
+            id_categorie = machine['id_categorie']
             ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
                      compte['type_tarif'], compte['type_subside'], compte['code_client'], client['abrev_labo'],
                      donnee['id_user'], user['nom'], user['prenom'], donnee['id_machine'], machine['nom'],
-                     machine['id_cout'], couts.donnees[id_cout]['intitule'], donnee['date_login'],
+                     machine['id_categorie'], categories.donnees[id_categorie]['intitule'], donnee['date_login'],
                      donnee['duree_machine_hp'], donnee['duree_machine_hc'], donnee['duree_operateur'], donnee['id_op'],
                      op['prenom'] + " " + op['nom'], donnee['remarque_op'], donnee['remarque_staff']]
             lignes.append(ligne)

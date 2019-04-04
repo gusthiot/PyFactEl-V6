@@ -2,14 +2,14 @@ from importes import Fichier
 from outils import Outils
 
 
-class Couts(Fichier):
+class Categorie(Fichier):
     """
-    Classe pour l'importation des données de Catégories de Coûts
+    Classe pour l'importation des données de Catégories
     """
 
-    cles = ['id_cat_cout', 'intitule', 'U1', 'U2', 'U3', 'MO']
-    nom_fichier = "categcout.csv"
-    libelle = "Catégories Coûts"
+    cles = ['id_categorie', 'intitule', 'unite']
+    nom_fichier = "categorie.csv"
+    libelle = "Catégories"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -25,7 +25,7 @@ class Couts(Fichier):
                     return 1
         else:
             for cat in self.donnees:
-                if cat['id_cat_cout'] == id_cat:
+                if cat['id_categorie'] == id_cat:
                     return 1
         return 0
 
@@ -48,27 +48,15 @@ class Couts(Fichier):
         del self.donnees[0]
         for donnee in self.donnees:
 
-            if donnee['id_cat_cout'] == "":
+            if donnee['id_categorie'] == "":
                 msg += "l'id catégorie de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_cat_cout'] not in ids:
-                ids.append(donnee['id_cat_cout'])
+            elif donnee['id_categorie'] not in ids:
+                ids.append(donnee['id_categorie'])
             else:
-                msg += "l'id catégorie '" + donnee['id_cat_cout'] + "' de la ligne " + str(ligne) +\
+                msg += "l'id catégorie '" + donnee['id_categorie'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            donnee['U1'], info = Outils.est_un_nombre(donnee['U1'], "le coût U1 ", ligne)
-            msg += info
-
-            donnee['U2'], info = Outils.est_un_nombre(donnee['U2'], "le coût U2 ", ligne)
-            msg += info
-
-            donnee['U3'], info = Outils.est_un_nombre(donnee['U3'], "le coût U3 ", ligne)
-            msg += info
-
-            donnee['MO'], info = Outils.est_un_nombre(donnee['MO'], "le coût MO ", ligne)
-            msg += info
-
-            donnees_dict[donnee['id_cat_cout']] = donnee
+            donnees_dict[donnee['id_categorie']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict

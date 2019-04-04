@@ -351,15 +351,15 @@ class Outils(object):
         création de la liste des machines présentes dans une somme
         :param somme: somme concernée
         :param machines: données machines
-        :return: liste de machines triée par id_cout, puis par nom
+        :return: liste de machines triée par id_categorie, puis par nom
         """
         machines_utilisees = {}
         for key in somme:
-            id_cout = machines.donnees[key]['id_cout']
+            id_categorie = machines.donnees[key]['id_categorie']
             nom = machines.donnees[key]['nom']
-            if id_cout not in machines_utilisees:
-                machines_utilisees[id_cout] = {}
-            machines_utilisees[id_cout][nom] = key
+            if id_categorie not in machines_utilisees:
+                machines_utilisees[id_categorie] = {}
+            machines_utilisees[id_categorie][nom] = key
 
         return machines_utilisees
 
