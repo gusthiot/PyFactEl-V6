@@ -308,6 +308,8 @@ class Annexes(object):
 
             for donnee in paramannexe.donnees:
                 if donnee['nom'] in pdfs_annexes:
+                    if len(pdfs_annexes[donnee['nom']]) > 1:
+                        Latex.concatenation_pdfs(donnee['nom'] + suffixe, pdfs_annexes[donnee['nom']])
                     Latex.finaliser_pdf(donnee['nom'] + suffixe, donnee['chemin'])
             files = [f for f in os.listdir('.') if os.path.isfile(f)]
             for f in files:
