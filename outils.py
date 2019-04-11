@@ -355,7 +355,7 @@ class Outils(object):
         """
         machines_utilisees = {}
         for key in somme:
-            id_categorie = machines.donnees[key]['id_categorie']
+            id_categorie = machines.donnees[key]['id_cat_mach']
             nom = machines.donnees[key]['nom']
             if id_categorie not in machines_utilisees:
                 machines_utilisees[id_categorie] = {}

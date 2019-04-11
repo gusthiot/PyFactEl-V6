@@ -103,7 +103,7 @@ class Reservation(Fichier):
             id_user = donnee['id_user']
             machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            prix = categprix.donnees[client['nature'] + machine['id_categorie']]
+            prix_mach = categprix.donnees[client['nature'] + machine['id_cat_mach']]['prix_unit']
             duree_fact_hp, duree_fact_hc = Rabais.rabais_reservation(machine['delai_sans_frais'],
                                                                      donnee['duree_ouvree'],
                                                                      donnee['duree_hp'],
@@ -114,8 +114,8 @@ class Reservation(Fichier):
 
             tx_hp = machine['tx_occ_eff_hp']
             tx_hc = machine['tx_occ_eff_hc']
-            pu_hp = round(prix['prix_h_mach_p'] * machine['tx_penalite_hp'] / 100, 2)
-            pu_hc = round(prix['prix_h_mach_p'] * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
+            pu_hp = round(prix_mach * machine['tx_penalite_hp'] / 100, 2)
+            pu_hc = round(prix_mach * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
             ok_hp = False
             ok_hc = False
             if duree_fact_hp > 0 and pu_hp > 0 and tx_hp > 0:

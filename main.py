@@ -175,8 +175,8 @@ if pe_present:
         sys.exit("Erreur dans la cohérence")
 
     livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
+    acces.calcul_montants(machines, categprix, clients, verification, comptes)
     reservations.calcul_montants(machines, categprix, clients, comptes, verification)
-    acces.calcul_montants(machines, categprix, clients, verification, categories, comptes)
 
     sommes = Sommes(verification, generaux)
     sommes.calculer_toutes(livraisons, reservations, acces, clients, machines)

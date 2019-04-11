@@ -26,7 +26,7 @@ class BilanMensuel(object):
 
             ligne = ["année", "mois", "référence", "code client", "code client sap", "abrév. labo", "nom labo",
                      "type client", "nature client", "Em base", "rabais Em", "nb utilisateurs",
-                     "nb comptes", "MAt", "MOt", "DHt", "Et", "Rt", "Mt"]
+                     "nb comptes", "-", "-", "DHt", "Et", "Rt", "Mt"]
             for categorie in generaux.codes_d3():
                 ligne.append(categorie + "t")
             ligne += ["total facturé HT", "Bonus Ht"]
@@ -71,8 +71,7 @@ class BilanMensuel(object):
             rht = client['rh'] * scl['dht']
 
             ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'], client['abrev_labo'],
-                     client['nom_labo'], 'U', client['nature'], scl['em'], scl['er'], nb_u, nb_c,
-                     Outils.format_2_dec(scl['mat']), Outils.format_2_dec(scl['mot']),
+                     client['nom_labo'], 'U', client['nature'], scl['em'], scl['er'], nb_u, nb_c, 0, 0,
                      Outils.format_2_dec(rht), scl['e'], Outils.format_2_dec(scl['r']),
                      Outils.format_2_dec(scl['mt'])]
             for categorie in generaux.codes_d3():

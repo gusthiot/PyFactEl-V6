@@ -44,8 +44,6 @@ class Annexes(object):
 
             filtre = generaux.filtrer_article_nul_par_code_n(client['nature'])
 
-            contenu_prix_bonus_xj = ""
-            contenu_prix_cae_xj = ""
             contenu_prix_xaj = ""
             contenu_prix_xf = ""
             inc_fact = 1
@@ -124,22 +122,6 @@ class Annexes(object):
                             ''' % dico_prix_xaj
                         contenu_prix_xaj += ligne
 
-                    # ## ligne Prix CAE X/J - Table Client Récap Procédés/Compte
-
-                    rhj = client['rh'] * sco['somme_j_dhi']
-                    dico_prix_cae_xj = {'intitule': intitule_compte,
-                                        'type': Latex.echappe_caracteres(compte['type_subside']),
-                                        'maij': Outils.format_2_dec(sco['somme_j_mai']),
-                                        'mm': Outils.format_2_dec(sco['somme_j_mm']),
-                                        'mr': Outils.format_2_dec(sco['somme_j_mr']),
-                                        'rhj': Outils.format_2_dec(rhj),
-                                        'moij': Outils.format_2_dec(sco['somme_j_moi']),
-                                        'mj': Outils.format_2_dec(sco['mj'])}
-                    contenu_prix_cae_xj += r'''
-                        %(intitule)s & %(type)s & %(maij)s & %(moij)s & %(rhj)s & %(mm)s & %(mr)s & %(mj)s \\
-                        \hline
-                        ''' % dico_prix_cae_xj
-
                     # ## ligne Prix LVR X/D/J - Table Client Récap Prestations livr./code D/Compte
 
                     if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
@@ -162,16 +144,6 @@ class Annexes(object):
                                 %(intitule)s & %(cmj)s & %(crj)s & %(cj)s \\
                                 \hline
                                 ''' % dico_prest_client
-
-                    # ## ligne Prix Bonus X/J - Table Client Récap Bonus/Compte
-
-                    if code_client in acces.sommes and id_compte in acces.sommes[code_client]['comptes']:
-                        bhj = client['bh'] * sco['somme_j_dhi']
-                        dico_prix_bonus_xj = {'compte': intitule_compte, 'bhj': Outils.format_2_dec(bhj)}
-                        contenu_prix_bonus_xj += r'''
-                            %(compte)s & %(bhj)s \\
-                            \hline
-                            ''' % dico_prix_bonus_xj
 
                     # ##
 

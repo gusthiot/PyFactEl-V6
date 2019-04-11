@@ -7,8 +7,8 @@ class Machine(Fichier):
     Classe pour l'importation des données de Machines Cmi
     """
 
-    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_categorie', 'tx_rabais_hc', 'tx_occ_eff_hp',
-            'tx_penalite_hp', 'tx_occ_eff_hc', 'tx_penalite_hc', 'delai_sans_frais']
+    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cat_mach', 'tx_rabais_hc', 'tx_occ_eff_hp', 'tx_penalite_hp',
+            'tx_occ_eff_hc', 'tx_penalite_hc', 'delai_sans_frais', 'id_cat_mo', 'îd_cat_plat']
     nom_fichier = "machine.csv"
     libelle = "Machines"
 
@@ -57,11 +57,24 @@ class Machine(Fichier):
                 msg += "l'id machine '" + donnee['id_machine'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
-            if donnee['id_categorie'] == "":
-                msg += "l'id catégorie de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['id_categorie']) == 0:
-                msg += "l'id catégorie '" + donnee['id_categorie'] + "' de la ligne " + str(ligne) \
+            if donnee['id_cat_mach'] == "":
+                msg += "l'id catégorie machine de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif categories.contient_id(donnee['id_cat_mach']) == 0:
+                msg += "l'id catégorie machine '" + donnee['id_cat_mach'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
+
+            if donnee['id_cat_mo'] == "":
+                msg += "l'id catégorie opérateur de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif categories.contient_id(donnee['id_cat_mo']) == 0:
+                msg += "l'id catégorie opérateur '" + donnee['id_cat_mo'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
+
+            if donnee['îd_cat_plat'] == "":
+                msg += "l'id catégorie plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif categories.contient_id(donnee['îd_cat_plat']) == 0:
+                msg += "l'id catégorie plateforme '" + donnee['îd_cat_plat'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
+
 
             donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'],
                                                                 "le rabais heures creuses", ligne)
@@ -74,8 +87,8 @@ class Machine(Fichier):
                                                                  "le taux effectif d'occupation HP", ligne)
             msg += info
             if donnee['tx_occ_eff_hp'] < 0 or donnee['tx_occ_eff_hp'] > 100:
-                msg += "le taux effectif d'occupation HP '" + str(donnee['tx_occ_eff_hp']) + "' de la ligne " + str(ligne) \
-                       + " doit être entre 0 et 100\n"
+                msg += "le taux effectif d'occupation HP '" + str(donnee['tx_occ_eff_hp']) + "' de la ligne " \
+                       + str(ligne) + " doit être entre 0 et 100\n"
 
             donnee['tx_penalite_hp'], info = Outils.est_un_nombre(donnee['tx_penalite_hp'], "la pénalité HP", ligne)
             msg += info

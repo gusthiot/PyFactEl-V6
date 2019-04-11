@@ -52,11 +52,11 @@ class Recapitulatifs(object):
             user = users.donnees[donnee['id_user']]
             op = users.donnees[donnee['id_op']]
             machine = machines.donnees[donnee['id_machine']]
-            id_categorie = machine['id_categorie']
+            id_categorie = machine['id_cat_mach']
             ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
                      compte['type_tarif'], compte['type_subside'], compte['code_client'], client['abrev_labo'],
                      donnee['id_user'], user['nom'], user['prenom'], donnee['id_machine'], machine['nom'],
-                     machine['id_categorie'], categories.donnees[id_categorie]['intitule'], donnee['date_login'],
+                     id_categorie, categories.donnees[id_categorie]['intitule'], donnee['date_login'],
                      donnee['duree_machine_hp'], donnee['duree_machine_hc'], donnee['duree_operateur'], donnee['id_op'],
                      op['prenom'] + " " + op['nom'], donnee['remarque_op'], donnee['remarque_staff']]
             lignes.append(ligne)

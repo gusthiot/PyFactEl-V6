@@ -26,7 +26,7 @@ class BilanComptes(object):
 
             ligne = ["année", "mois", "référence", "code client", "code client sap", "abrév. labo", "nom labo",
                      "type client", "nature client", "id-compte", "numéro compte", "intitulé compte",
-                     "code type compte", "maj", "moj", "rabais", "mj"]
+                     "code type compte", "-", "-", "rabais", "mj"]
             for categorie in generaux.codes_d3():
                 ligne.append(categorie + "j")
             ligne += ["somme-j", "bonus"]
@@ -66,8 +66,7 @@ class BilanComptes(object):
                     sco = sommes.sommes_comptes[code_client][id_compte]
                     ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'],
                              client['abrev_labo'], client['nom_labo'], 'U', client['nature'], id_compte, num_compte,
-                             compte['intitule'], compte['type_subside'], Outils.format_2_dec(sco['somme_j_mai']),
-                             Outils.format_2_dec(sco['somme_j_moi']),
+                             compte['intitule'], compte['type_subside'], 0, 0,
                              Outils.format_2_dec(client['rh'] * sco['somme_j_dhi']), Outils.format_2_dec(sco['mj'])]
                     total = sco['mj']
                     for categorie in generaux.codes_d3():

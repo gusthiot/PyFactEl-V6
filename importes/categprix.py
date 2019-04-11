@@ -8,7 +8,7 @@ class CategPrix(Fichier):
     """
 
     nom_fichier = "categprix.csv"
-    cles = ['nature', 'id_categorie', 'prix_h_mach_p', 'prix_h_mo_o']
+    cles = ['nature', 'id_categorie', 'prix_unit']
     libelle = "Catégories Prix"
 
     def __init__(self, *args, **kwargs):
@@ -62,12 +62,7 @@ class CategPrix(Fichier):
                     msg += "Couple id catégorie '" + donnee['id_categorie'] + "' et nature '" + \
                            donnee['nature'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['prix_h_mach_p'], info = Outils.est_un_nombre(donnee['prix_h_mach_p'], "le prix horaire machine ",
-                                                                 ligne)
-            msg += info
-
-            donnee['prix_h_mo_o'], info = Outils.est_un_nombre(donnee['prix_h_mo_o'], "le prix horaire main d'oeuvre",
-                                                               ligne)
+            donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire ", ligne)
             msg += info
 
             donnees_dict[donnee['nature'] + donnee['id_categorie']] = donnee

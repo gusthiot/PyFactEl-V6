@@ -96,14 +96,13 @@ class Acces(Fichier):
             return 1
         return 0
 
-    def calcul_montants(self, machines, categprix, clients, verification, categories, comptes):
+    def calcul_montants(self, machines, categprix, clients, verification, comptes):
         """
         calcule les sous-totaux nécessaires
         :param machines: machines importées
         :param categprix: catégories prix importés et vérifiés
         :param clients: clients importés et vérifiés
         :param verification: pour vérifier si les dates et les cohérences sont correctes
-        :param categories: catégories importées
         :param comptes: comptes importés
 
         """
@@ -121,7 +120,7 @@ class Acces(Fichier):
             code_client = comptes.donnees[id_compte]['code_client']
             machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            prix = categprix.donnees[client['nature'] + machine['id_categorie']]
+            prix_mach = categprix.donnees[client['nature'] + machine['id_cat_mach']]['prix_unit']
 
             if code_client not in self.sommes:
                 self.sommes[code_client] = {'comptes': {}, 'machines': {}}
@@ -131,14 +130,13 @@ class Acces(Fichier):
             sco = scl[id_compte]
 
             if id_machine not in sco:
-                pum = round(prix['prix_h_mach_p'], 2)
-                puo = round(prix['prix_h_mo_o'], 2)
-                du_hc = round(prix['prix_h_mach_p'] * machine['tx_rabais_hc'] / 100, 2)
-                sco[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0, 'users': {},
-                                   'du_hc': du_hc, 'pum': pum, 'puo': puo}
+                du_hc = round(prix_mach * machine['tx_rabais_hc'] / 100, 2)
+                sco[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0, 'runs': 0, 'users': {},
+                                   'du_hc': du_hc}
             sco[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             sco[id_machine]['duree_hc'] += donnee['duree_machine_hc']
             sco[id_machine]['mo'] += donnee['duree_operateur']
+            sco[id_machine]['runs'] += 1
 
             scm = sco[id_machine]['users']
 
@@ -152,11 +150,11 @@ class Acces(Fichier):
 
             scma = self.sommes[code_client]['machines']
             if id_machine not in scma:
-                pur_hp = round(prix['prix_h_mach_p'] * machine['tx_penalite_hp'] / 100, 2)
-                pur_hc = round(prix['prix_h_mach_p'] * machine['tx_penalite_hc'] / 100 *
+                pur_hp = round(prix_mach * machine['tx_penalite_hp'] / 100, 2)
+                pur_hc = round(prix_mach * machine['tx_penalite_hc'] / 100 *
                                (1 - machine['tx_rabais_hc'] / 100), 2)
-                du_hc = round(prix['prix_h_mach_p'] * machine['tx_rabais_hc'] / 100, 2)
-                scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0,  'pur_hp': pur_hp, 'pur_hc': pur_hc, 'du_hc': du_hc,
+                du_hc = round(prix_mach * machine['tx_rabais_hc'] / 100, 2)
+                scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'pur_hp': pur_hp, 'pur_hc': pur_hc, 'du_hc': du_hc,
                                     'dhm': 0, 'users': {}}
             scma[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             scma[id_machine]['duree_hc'] += donnee['duree_machine_hc']
@@ -177,6 +175,7 @@ class Acces(Fichier):
         self.donnees = donnees_list
 
         for code_client in self.sommes:
+            client = clients.donnees[code_client]
             for id_machine in self.sommes[code_client]['machines']:
                 scm = self.sommes[code_client]['machines'][id_machine]
                 scm['dhm'] += math.ceil(scm['du_hc'] * scm['duree_hc'] / 60)
@@ -187,26 +186,49 @@ class Acces(Fichier):
                 if id_compte not in self.sommes[code_client]['categories']:
                     self.sommes[code_client]['categories'][id_compte] = {}
                 scat = self.sommes[code_client]['categories'][id_compte]
+                scat['machine'] = {}
+                scat['operateur'] = {}
+                scat['plateforme'] = {}
                 for id_machine in sco:
                     machine = machines.donnees[id_machine]
-                    id_categorie = machine['id_categorie']
-                    sco[id_machine]['mai_hp'] = round(sco[id_machine]['duree_hp'] / 60 * sco[id_machine]['pum'], 2)
-                    sco[id_machine]['mai_hc'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['pum'], 2)
-                    sco[id_machine]['moi'] = round(sco[id_machine]['mo'] / 60 * sco[id_machine]['puo'], 2)
                     sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['du_hc'], 2)
+                    cat_mach = machine['id_cat_mach']
+                    cat_mo = machine['id_cat_mo']
+                    cat_plat = machine['îd_cat_plat']
 
-                    if id_categorie not in scat:
-                        scat[id_categorie] = {'duree_hp': 0, 'duree_hc': 0, 'mo': 0,
-                                         'pum': sco[id_machine]['pum'],'puo': sco[id_machine]['puo']}
-                    scat[id_categorie]['duree_hp'] += sco[id_machine]['duree_hp']
-                    scat[id_categorie]['duree_hc'] += sco[id_machine]['duree_hc']
-                    scat[id_categorie]['mo'] += sco[id_machine]['mo']
+                    if cat_mach not in scat['machine']:
+                        prix_mach = categprix.donnees[client['nature'] + machine['id_cat_mach']]['prix_unit']
+                        scat['machine'][cat_mach] = {'pk': round(prix_mach, 2), 'quantite': 0, 'mk': 0,
+                                                     'duree_hp': 0, 'duree_hc': 0, 'mo': 0}
 
-                for id_categorie in scat:
-                    scat[id_categorie]['duree'] = scat[id_categorie]['duree_hp'] + scat[id_categorie]['duree_hc']
-                    scat[id_categorie]['mai'] = round(scat[id_categorie]['duree'] / 60 * scat[id_categorie]['pum'], 2)
-                    scat[id_categorie]['moi'] = round(scat[id_categorie]['mo'] / 60 * scat[id_categorie]['puo'], 2)
+                    if cat_mo not in scat['operateur']:
+                        prix_mo = categprix.donnees[client['nature'] + machine['id_cat_mo']]['prix_unit']
+                        scat['operateur'][cat_mo] = {'pk': round(prix_mo, 2), 'quantite': 0, 'mk': 0}
 
+                    if cat_plat not in scat['plateforme']:
+                        prix_plat = categprix.donnees[client['nature'] + machine['îd_cat_plat']]['prix_unit']
+                        scat['plateforme'][cat_plat] = {'pk': round(prix_plat, 2), 'quantite': 0, 'mk': 0}
+
+                    scat['machine'][cat_mach]['duree_hp'] += sco[id_machine]['duree_hp']
+                    scat['machine'][cat_mach]['duree_hc'] += sco[id_machine]['duree_hc']
+                    scat['machine'][cat_mach]['mo'] += sco[id_machine]['mo']
+                    scat['machine'][cat_mach]['quantite'] += sco[id_machine]['duree_hp']
+                    scat['machine'][cat_mach]['quantite'] += sco[id_machine]['duree_hc']
+                    scat['operateur'][cat_mo]['quantite'] += sco[id_machine]['mo']
+                    scat['plateforme'][cat_plat]['quantite'] += sco[id_machine]['runs']
+
+                for id_categorie in scat['machine']:
+                    scat['machine'][id_categorie]['mk'] = round(
+                        scat['machine'][id_categorie]['quantite'] / 60 * scat['machine'][id_categorie]['pk'],
+                        2)
+                for id_categorie in scat['operateur']:
+                    scat['operateur'][id_categorie]['mk'] = round(
+                        scat['operateur'][id_categorie]['quantite'] / 60 * scat['operateur'][id_categorie]['pk'],
+                        2)
+                for id_categorie in scat['plateforme']:
+                    scat['plateforme'][id_categorie]['mk'] = round(
+                        scat['plateforme'][id_categorie]['quantite'] * scat['plateforme'][id_categorie]['pk'],
+                        2)
 
     def acces_pour_compte(self, id_compte, code_client):
         """

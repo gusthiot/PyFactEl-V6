@@ -68,7 +68,7 @@ class Detail(object):
                     base_compte = base_client + [id_compte, num_compte, compte['intitule'], compte['type_subside']]
 
                     if code_client in acces.sommes and id_compte in acces.sommes[code_client]['categories']:
-                        som_cats = acces.sommes[code_client]['categories'][id_compte]
+                        som_cats = acces.sommes[code_client]['categories'][id_compte]['machine']
                         for id_categorie, som_cat in sorted(som_cats.items()):
                             duree = som_cat['duree_hp'] + som_cat['duree_hc']
                             ligne = base_compte + ['M', id_categorie, categories.donnees[id_categorie]['intitule'], duree,
