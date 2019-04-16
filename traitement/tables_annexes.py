@@ -658,10 +658,10 @@ class TablesAnnexes(object):
 
             for id_categorie, cats in sorted(som_cat.items()):
                 dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
-                            'pk': Outils.format_2_dec(som_cat[id_categorie]['pk']),
+                            'pk': Outils.format_2_dec(cats['pk']),
                             'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
-                            'quantite': Outils.format_heure(som_cat[id_categorie]['quantite']),
-                            'mk': Outils.format_2_dec(som_cat[id_categorie]['mk'])}
+                            'quantite': Outils.format_heure(cats['quantite']),
+                            'mk': Outils.format_2_dec(cats['mk'])}
                 contenu += r'''
                     %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
                     \hline
@@ -670,24 +670,26 @@ class TablesAnnexes(object):
             som_cat = sommes_acces[code_client]['categories'][id_compte]['operateur']
 
             for id_categorie, cats in sorted(som_cat.items()):
-                dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
-                            'pk': Outils.format_2_dec(som_cat[id_categorie]['pk']),
-                            'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
-                            'quantite': Outils.format_heure(som_cat[id_categorie]['quantite']),
-                            'mk': Outils.format_2_dec(som_cat[id_categorie]['mk'])}
-                contenu += r'''
-                    %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
-                    \hline
-                    ''' % dico_cat
+                quantite = cats['quantite']
+                if quantite > 0:
+                    dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
+                                'pk': Outils.format_2_dec(cats['pk']),
+                                'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
+                                'quantite': Outils.format_heure(quantite),
+                                'mk': Outils.format_2_dec(cats['mk'])}
+                    contenu += r'''
+                        %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
+                        \hline
+                        ''' % dico_cat
 
             som_cat = sommes_acces[code_client]['categories'][id_compte]['plateforme']
 
             for id_categorie, cats in sorted(som_cat.items()):
                 dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
-                            'pk': Outils.format_2_dec(som_cat[id_categorie]['pk']),
+                            'pk': Outils.format_2_dec(cats['pk']),
                             'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
-                            'quantite': Outils.format_2_dec(som_cat[id_categorie]['quantite']),
-                            'mk': Outils.format_2_dec(som_cat[id_categorie]['mk'])}
+                            'quantite': cats['quantite'],
+                            'mk': Outils.format_2_dec(cats['mk'])}
                 contenu += r'''
                     %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
                     \hline
