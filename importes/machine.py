@@ -8,7 +8,7 @@ class Machine(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cat_mach', 'tx_rabais_hc', 'tx_occ_eff_hp', 'tx_penalite_hp',
-            'tx_occ_eff_hc', 'tx_penalite_hc', 'delai_sans_frais', 'id_cat_mo', 'îd_cat_plat']
+            'tx_occ_eff_hc', 'tx_penalite_hc', 'delai_sans_frais', 'id_cat_mo', 'îd_cat_plat', 'id_cat_cher']
     nom_fichier = "machine.csv"
     libelle = "Machines"
 

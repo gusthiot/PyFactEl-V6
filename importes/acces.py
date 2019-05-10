@@ -189,25 +189,32 @@ class Acces(Fichier):
                 scat['machine'] = {}
                 scat['operateur'] = {}
                 scat['plateforme'] = {}
+                scat['cher'] = {}
                 for id_machine in sco:
                     machine = machines.donnees[id_machine]
                     sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['du_hc'], 2)
                     cat_mach = machine['id_cat_mach']
                     cat_mo = machine['id_cat_mo']
                     cat_plat = machine['îd_cat_plat']
+                    cat_cher = machine['id_cat_cher']
+                    nat = client['nature']
 
                     if cat_mach not in scat['machine']:
-                        prix_mach = categprix.donnees[client['nature'] + machine['id_cat_mach']]['prix_unit']
+                        prix_mach = categprix.donnees[nat + cat_mach]['prix_unit']
                         scat['machine'][cat_mach] = {'pk': round(prix_mach, 2), 'quantite': 0, 'mk': 0,
                                                      'duree_hp': 0, 'duree_hc': 0, 'mo': 0}
 
                     if cat_mo not in scat['operateur']:
-                        prix_mo = categprix.donnees[client['nature'] + machine['id_cat_mo']]['prix_unit']
+                        prix_mo = categprix.donnees[nat + cat_mo]['prix_unit']
                         scat['operateur'][cat_mo] = {'pk': round(prix_mo, 2), 'quantite': 0, 'mk': 0}
 
                     if cat_plat not in scat['plateforme']:
-                        prix_plat = categprix.donnees[client['nature'] + machine['îd_cat_plat']]['prix_unit']
+                        prix_plat = categprix.donnees[nat + cat_plat]['prix_unit']
                         scat['plateforme'][cat_plat] = {'pk': round(prix_plat, 2), 'quantite': 0, 'mk': 0}
+
+                    if cat_cher not in scat['cher']:
+                        prix_cher = categprix.donnees[nat + cat_cher]['prix_unit']
+                        scat['cher'][cat_cher] = {'pk': round(prix_cher, 2), 'quantite': 0, 'mk': 0}
 
                     scat['machine'][cat_mach]['duree_hp'] += sco[id_machine]['duree_hp']
                     scat['machine'][cat_mach]['duree_hc'] += sco[id_machine]['duree_hc']
@@ -216,6 +223,8 @@ class Acces(Fichier):
                     scat['machine'][cat_mach]['quantite'] += sco[id_machine]['duree_hc']
                     scat['operateur'][cat_mo]['quantite'] += sco[id_machine]['mo']
                     scat['plateforme'][cat_plat]['quantite'] += sco[id_machine]['runs']
+                    scat['cher'][cat_cher]['quantite'] += sco[id_machine]['duree_hp']
+                    scat['cher'][cat_cher]['quantite'] += sco[id_machine]['duree_hc']
 
                 for id_categorie in scat['machine']:
                     scat['machine'][id_categorie]['mk'] = round(
@@ -228,6 +237,10 @@ class Acces(Fichier):
                 for id_categorie in scat['plateforme']:
                     scat['plateforme'][id_categorie]['mk'] = round(
                         scat['plateforme'][id_categorie]['quantite'] * scat['plateforme'][id_categorie]['pk'],
+                        2)
+                for id_categorie in scat['cher']:
+                    scat['cher'][id_categorie]['mk'] = round(
+                        scat['cher'][id_categorie]['quantite'] / 60 * scat['cher'][id_categorie]['pk'],
                         2)
 
     def acces_pour_compte(self, id_compte, code_client):

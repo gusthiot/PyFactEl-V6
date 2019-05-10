@@ -695,6 +695,21 @@ class TablesAnnexes(object):
                     \hline
                     ''' % dico_cat
 
+            som_cat = sommes_acces[code_client]['categories'][id_compte]['cher']
+
+            for id_categorie, cats in sorted(som_cat.items()):
+                quantite = cats['quantite']
+                if quantite > 0:
+                    dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
+                                'pk': Outils.format_2_dec(cats['pk']),
+                                'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
+                                'quantite': Outils.format_heure(quantite),
+                                'mk': Outils.format_2_dec(cats['mk'])}
+                    contenu += r'''
+                        %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
+                        \hline
+                        ''' % dico_cat
+
             dico_cat = {'mk_d': Outils.format_2_dec(sco['somme_j_mk_d']),
                         'mkj': Outils.format_2_dec(sco['somme_j_mk'])}
 
