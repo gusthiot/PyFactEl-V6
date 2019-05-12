@@ -75,6 +75,11 @@ class Machine(Fichier):
                 msg += "l'id catégorie plateforme '" + donnee['îd_cat_plat'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
+            if donnee['id_cat_cher'] == "":
+                msg += "l'id catégorie onéreux de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif categories.contient_id(donnee['id_cat_cher']) == 0:
+                msg += "l'id catégorie onéreux '" + donnee['id_cat_cher'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
 
             donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'],
                                                                 "le rabais heures creuses", ligne)
