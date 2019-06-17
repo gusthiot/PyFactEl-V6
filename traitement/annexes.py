@@ -55,6 +55,15 @@ class Annexes(object):
             contenu_projets = ""
             contenu_details = ""
 
+            todo = {}
+            for donnee in paramannexe.donnees:
+                if generaux.code_ref_par_code_n(client['nature']) == "INT":
+                    todo[donnee['nom']] = donnee['int']
+                elif client['mode'] == "MAIL":
+                    todo[donnee['nom']] = donnee['ext_mail']
+                else:
+                    todo[donnee['nom']] = donnee['ext_postal']
+
             if code_client in sommes.sommes_comptes:
                 comptes_utilises = Outils.comptes_in_somme(sommes.sommes_comptes[code_client], comptes)
 
@@ -186,50 +195,52 @@ class Annexes(object):
             pdfs_annexes = {}
 
             if scl['somme_t'] > 0:
+                if todo['Annexe-client'] != "NO":
+                    contenu_annexe_client = Annexes.entete(edition)
+                    contenu_annexe_client += Annexes.titre_annexe(client, edition, generaux, reference,
+                                                                  "Récapitulatif pour le client", "Annexe facture")
+                    contenu_annexe_client += Annexes.section(client, generaux, reference,
+                                                             "Récapitulatif pour le client")
 
-                contenu_annexe_client = Annexes.entete(edition)
-                contenu_annexe_client += Annexes.titre_annexe(client, edition, generaux, reference,
-                                                              "Récapitulatif pour le client", "Annexe facture")
-                contenu_annexe_client += Annexes.section(client, generaux, reference, "Récapitulatif pour le client")
+                    contenu_annexe_client += TablesAnnexes.table_prix_xf(scl, generaux, filtre, contenu_prix_xf)
+                    contenu_annexe_client += TablesAnnexes.table_prix_xaj(scl, generaux, contenu_prix_xaj)
+                    if av_hc == "BONUS":
+                        contenu_annexe_client += TablesAnnexes.table_points_xbmu(code_client, scl, acces.sommes,
+                                                                                 machines, users)
+                    contenu_annexe_client += TablesAnnexes.table_prix_xrmu(code_client, scl, reservations.sommes,
+                                                                           machines, users)
+                    contenu_annexe_client += r'''\end{document}'''
+                    Latex.creer_latex_pdf('Annexe-client' + suffixe, contenu_annexe_client)
+                    pdfs_annexes['Annexe-client'] = ['Annexe-client' + suffixe + ".pdf"]
 
-                contenu_annexe_client += TablesAnnexes.table_prix_xf(scl, generaux, filtre, contenu_prix_xf)
-                contenu_annexe_client += TablesAnnexes.table_prix_xaj(scl, generaux, contenu_prix_xaj)
-                if av_hc == "BONUS":
-                    contenu_annexe_client += TablesAnnexes.table_points_xbmu(code_client, scl, acces.sommes, machines,
-                                                                             users)
-                contenu_annexe_client += TablesAnnexes.table_prix_xrmu(code_client, scl, reservations.sommes, machines,
-                                                                       users)
-                contenu_annexe_client += r'''\end{document}'''
-                Latex.creer_latex_pdf('Annexe-client' + suffixe, contenu_annexe_client)
-                pdfs_annexes['Annexe-client'] = ['Annexe-client' + suffixe + ".pdf"]
-
-                if not contenu_projets == "":
+                if not contenu_projets == "" and todo['Annexe-projets'] != "NO":
                     contenu_annexe_projets = Annexes.entete(edition)
                     contenu_annexe_projets += contenu_projets
                     contenu_annexe_projets += r'''\end{document}'''
                     Latex.creer_latex_pdf('Annexe-projets' + suffixe, contenu_annexe_projets)
                     pdfs_annexes['Annexe-projets'] = ['Annexe-projets' + suffixe + ".pdf"]
 
-                contenu_details_2 = ""
-                if code_client in reservations.sommes or contenu_cae_xmu != "":
-                    contenu_details_2 += Annexes.titre_annexe(client, edition, generaux, reference,
-                                                              "Annexe détaillée des pénalités de réservation",
-                                                              "Annexe facture")
-                    contenu_details_2 += Annexes.section(client, generaux, reference,
-                                                         "Annexe détaillée des pénalités de réservation")
-                    contenu_details_2 += TablesAnnexes.table_tps_penares_xmu(code_client, scl, acces.sommes,
-                                                                             reservations.sommes, machines, users)
-                    contenu_details_2 += TablesAnnexes.table_tps_m_cae_xmu(code_client, acces, contenu_cae_xmu)
-                    contenu_details_2 += TablesAnnexes.table_tps_res_xmu(code_client, reservations, machines, users)
-                if not contenu_details == "" or not contenu_details_2 == "":
-                    contenu_annexe_details = Annexes.entete(edition)
-                    contenu_annexe_details += contenu_details
-                    contenu_annexe_details += contenu_details_2
-                    contenu_annexe_details += r'''\end{document}'''
-                    Latex.creer_latex_pdf('Annexe-détails' + suffixe, contenu_annexe_details)
-                    pdfs_annexes['Annexe-détails'] = ['Annexe-détails' + suffixe + ".pdf"]
+                if todo['Annexe-détails'] != "NO":
+                    contenu_details_2 = ""
+                    if code_client in reservations.sommes or contenu_cae_xmu != "":
+                        contenu_details_2 += Annexes.titre_annexe(client, edition, generaux, reference,
+                                                                  "Annexe détaillée des pénalités de réservation",
+                                                                  "Annexe facture")
+                        contenu_details_2 += Annexes.section(client, generaux, reference,
+                                                             "Annexe détaillée des pénalités de réservation")
+                        contenu_details_2 += TablesAnnexes.table_tps_penares_xmu(code_client, scl, acces.sommes,
+                                                                                 reservations.sommes, machines, users)
+                        contenu_details_2 += TablesAnnexes.table_tps_m_cae_xmu(code_client, acces, contenu_cae_xmu)
+                        contenu_details_2 += TablesAnnexes.table_tps_res_xmu(code_client, reservations, machines, users)
+                    if not contenu_details == "" or not contenu_details_2 == "":
+                        contenu_annexe_details = Annexes.entete(edition)
+                        contenu_annexe_details += contenu_details
+                        contenu_annexe_details += contenu_details_2
+                        contenu_annexe_details += r'''\end{document}'''
+                        Latex.creer_latex_pdf('Annexe-détails' + suffixe, contenu_annexe_details)
+                        pdfs_annexes['Annexe-détails'] = ['Annexe-détails' + suffixe + ".pdf"]
 
-                if docpdf is not None:
+                if docpdf is not None and todo['Annexe-pièces'] != "NO":
                     pdfs = docpdf.pdfs_pour_client(client, 'Annexe-pièces')
                     if pdfs is not None and len(pdfs) > 0:
                         nom_pdf = 'Annexe-pièces' + suffixe
@@ -253,7 +264,7 @@ class Annexes(object):
                         Latex.creer_latex_pdf(nom_pdf, contenu_annexe_pieces)
                         pdfs_annexes['Annexe-pièces'] = pieces
 
-            if docpdf is not None:
+            if docpdf is not None and todo['Annexe-interne'] != "NO":
                 pdfs = docpdf.pdfs_pour_client(client, 'Annexe-interne')
                 if pdfs is not None and len(pdfs) > 0:
                     nom_pdf = 'Annexe-interne-anntemp'
