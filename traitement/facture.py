@@ -117,13 +117,15 @@ class Facture(object):
                 for donnee in paramannexe.donnees:
                     nom_annexe = donnee['nom'] + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + \
                                  "_" + str(edition.version) + "_" + code_client + ".pdf"
-                    ligne.append(donnee['lien'] + nom_annexe)
                     if generaux.code_ref_par_code_n(client['nature']) == "INT":
-                        ligne.append(donnee['int'])
+                        code = donnee['int']
                     elif client['mode'] == "MAIL":
-                        ligne.append(donnee['ext_mail'])
+                        code = donnee['ext_mail']
                     else:
-                        ligne.append(donnee['ext_postal'])
+                        code = donnee['ext_postal']
+                    if code != "NO":
+                        ligne.append(donnee['lien'] + nom_annexe)
+                        ligne.append(code)
 
                 fichier_writer.writerow(ligne)
     
