@@ -128,8 +128,8 @@ class Livraison(Fichier):
             if no_prestation not in scl[id_compte][categorie]:
                 scl[id_compte][categorie][no_prestation] = {'nom': prestation['designation'],
                                                             'unite': prestation['unite_prest'], 'rabais': 0,
-                                                            'quantite': 0, 'pu': prix_unit_client,
-                                                            'pux': round(prestation['prix_unit'], 2), 'users': {}}
+                                                            'quantite': 0, 'pn': prix_unit_client,
+                                                            'pu': round(prestation['prix_unit'], 2), 'users': {}}
 
             scp = scl[id_compte][categorie][no_prestation]
             scp['quantite'] += donnee['quantite']
@@ -150,8 +150,10 @@ class Livraison(Fichier):
                 for categorie in self.sommes[code_client][id_compte]:
                     scc = self.sommes[code_client][id_compte][categorie]
                     for prestation in scc:
-                        scc[prestation]['montant'] = round(scc[prestation]['quantite'] * scc[prestation]['pu'], 2)
-                        scc[prestation]['montantx'] = round(scc[prestation]['quantite'] * scc[prestation]['pux'], 2)
+                        scc[prestation]['montant'] = round(
+                            2 * scc[prestation]['quantite'] * scc[prestation]['pn'], 1) / 2
+                        scc[prestation]['montantx'] = round(
+                            2 * scc[prestation]['quantite'] * scc[prestation]['pu'], 1) / 2
 
     def livraisons_pour_compte_par_categorie(self, id_compte, code_client, prestations):
         """

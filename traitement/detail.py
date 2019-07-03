@@ -75,10 +75,6 @@ class Detail(object):
                                                    som_cat['mo'], 0, 0, 0, 0, "", "", "", "", "", "", ""]
                             lignes.append(ligne)
 
-                        ligne = base_compte + ['M', 'Arrondi', "", "", "", 0, 0, 0, 0,  "", "", "", "", "", "",
-                                               ""]
-                        lignes.append(ligne)
-
                     if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
                         somme = livraisons.sommes[code_client][id_compte]
 
@@ -91,13 +87,5 @@ class Detail(object):
                                                            Outils.format_2_dec(sip['montantx']),
                                                            Outils.format_2_dec(sip['rabais']), prestation['categ_stock'], prestation['affiliation']]
                                     lignes.append(ligne)
-
-                                ligne = base_compte + [article.code_d, "", "", "", "", "", "", "", "",
-                                                       'Arrondi', "", "",
-                                                       Outils.format_2_dec(
-                                                           sclo[id_compte]['sommes_cat_m_x_d'][article.code_d]),
-                                                       Outils.format_2_dec(
-                                                           sclo[id_compte]['sommes_cat_r_d'][article.code_d]), "", ""]
-                                lignes.append(ligne)
 
         return lignes

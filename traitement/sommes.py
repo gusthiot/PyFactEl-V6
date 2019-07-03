@@ -8,7 +8,7 @@ class Sommes(object):
     Classe contenant les méthodes pour le calcul des sommes par compte, catégorie et client
     """
 
-    cles_somme_compte = ['somme_j_mk', 'somme_j_mk_d', 'somme_j_dhi', 'somme_j_dhi_d', 'somme_j_mm', 'somme_j_mr',
+    cles_somme_compte = ['somme_j_mk', 'somme_j_dhi', 'somme_j_dhi_d', 'somme_j_mm', 'somme_j_mr',
                          'somme_j_mb', 'c1', 'c2']
 
     cles_somme_client = ['dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em', 'er', 'e', 'res', 'rm',
@@ -41,11 +41,10 @@ class Sommes(object):
         self.somme_par_compte(livraisons, acces, clients)
         self.somme_par_client(clients, reservations, machines, acces)
 
-    def nouveau_somme(self, cles, est_compte=False):
+    def nouveau_somme(self, cles):
         """
         créé un nouveau dictionnaire avec les clés entrées
         :param cles: clés pour le dictionnaire
-        :param est_compte: True s'il s'agit d'une somme par compte
         :return: dictionnaire indexé par les clés données, avec valeurs à zéro
         """
         somme = {}
@@ -54,22 +53,10 @@ class Sommes(object):
         somme['sommes_cat_m'] = {}
         somme['sommes_cat_r'] = {}
         somme['tot_cat'] = {}
-        if est_compte:
-            somme['sommes_cat_m_d'] = {}
-            somme['sommes_cat_r_d'] = {}
-            somme['sommes_cat_m_x'] = {}
-            somme['sommes_cat_m_x_d'] = {}
-            somme['tot_cat_x'] = {}
         for categorie in self.categories:
             somme['sommes_cat_m'][categorie] = 0
             somme['sommes_cat_r'][categorie] = 0
             somme['tot_cat'][categorie] = 0
-            if est_compte:
-                somme['sommes_cat_m_d'][categorie] = 0
-                somme['sommes_cat_r_d'][categorie] = 0
-                somme['sommes_cat_m_x'][categorie] = 0
-                somme['sommes_cat_m_x_d'][categorie] = 0
-                somme['tot_cat_x'][categorie] = 0
         return somme
 
     def somme_par_compte(self, livraisons, acces, clients):
@@ -92,7 +79,7 @@ class Sommes(object):
             spco_cl = spco[code_client]
             for id_compte in acces.sommes[code_client]['comptes']:
                 if id_compte not in spco_cl:
-                    spco_cl[id_compte] = self.nouveau_somme(Sommes.cles_somme_compte, True)
+                    spco_cl[id_compte] = self.nouveau_somme(Sommes.cles_somme_compte)
                 somme = spco_cl[id_compte]
                 ac_som = acces.sommes[code_client]['comptes']
                 if id_compte in ac_som:
@@ -110,22 +97,18 @@ class Sommes(object):
             spco_cl = spco[code_client]
             for id_compte in livraisons.sommes[code_client]:
                 if id_compte not in spco_cl:
-                    spco_cl[id_compte] = self.nouveau_somme(Sommes.cles_somme_compte, True)
+                    spco_cl[id_compte] = self.nouveau_somme(Sommes.cles_somme_compte)
                 somme = spco_cl[id_compte]
 
                 for categorie in livraisons.sommes[code_client][id_compte]:
                     scc = livraisons.sommes[code_client][id_compte][categorie]
                     for prestation in scc:
                         somme['sommes_cat_m'][categorie] += scc[prestation]['montant']
-                        somme['sommes_cat_m_x'][categorie] += scc[prestation]['montantx']
                         somme['sommes_cat_r'][categorie] += scc[prestation]['rabais']
 
         for code_client in spco:
             for id_compte in spco[code_client]:
                 somme = spco[code_client][id_compte]
-                mkj = round(2 * somme['somme_j_mk'], 1) / 2
-                somme['somme_j_mk_d'] = mkj - somme['somme_j_mk']
-                somme['somme_j_mk'] = mkj
 
                 dhij = round(2 * somme['somme_j_dhi'], 1) / 2
                 somme['somme_j_dhi_d'] = dhij - somme['somme_j_dhi']
@@ -138,22 +121,10 @@ class Sommes(object):
                 somme['mj'] = somme['somme_j_mm'] - somme['somme_j_mr']
 
                 for categorie in self.categories:
-                    cat_m = round(2 * somme['sommes_cat_m'][categorie], 1) / 2
-                    somme['sommes_cat_m_d'][categorie] = cat_m - somme['sommes_cat_m'][categorie]
-                    somme['sommes_cat_m'][categorie] = cat_m
-
                     cat_r = round(2 * somme['sommes_cat_r'][categorie], 1) / 2
-                    somme['sommes_cat_r_d'][categorie] = cat_r - somme['sommes_cat_r'][categorie]
                     somme['sommes_cat_r'][categorie] = cat_r
 
                     somme['tot_cat'][categorie] = somme['sommes_cat_m'][categorie] - somme['sommes_cat_r'][categorie]
-
-                    cat_mx = round(2 * somme['sommes_cat_m_x'][categorie], 1) / 2
-                    somme['sommes_cat_m_x_d'][categorie] = cat_mx - somme['sommes_cat_m_x'][categorie]
-                    somme['sommes_cat_m_x'][categorie] = cat_mx
-
-                    somme['tot_cat_x'][categorie] = somme['sommes_cat_m_x'][categorie]
-                    somme['tot_cat_x'][categorie] -= somme['sommes_cat_r'][categorie]
 
                 somme['c1'] = somme['somme_j_mm']
                 somme['c2'] = somme['mj']

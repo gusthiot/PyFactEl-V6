@@ -228,20 +228,20 @@ class Acces(Fichier):
 
                 for id_categorie in scat['machine']:
                     scat['machine'][id_categorie]['mk'] = round(
-                        scat['machine'][id_categorie]['quantite'] / 60 * scat['machine'][id_categorie]['pk'],
-                        2)
+                        2 * scat['machine'][id_categorie]['quantite'] / 60 * scat['machine'][id_categorie]['pk'],
+                        1) / 2
                 for id_categorie in scat['operateur']:
                     scat['operateur'][id_categorie]['mk'] = round(
-                        scat['operateur'][id_categorie]['quantite'] / 60 * scat['operateur'][id_categorie]['pk'],
-                        2)
+                        2 * scat['operateur'][id_categorie]['quantite'] / 60 * scat['operateur'][id_categorie]['pk'],
+                        1) / 2
                 for id_categorie in scat['plateforme']:
                     scat['plateforme'][id_categorie]['mk'] = round(
-                        scat['plateforme'][id_categorie]['quantite'] * scat['plateforme'][id_categorie]['pk'],
-                        2)
+                        2 * scat['plateforme'][id_categorie]['quantite'] * scat['plateforme'][id_categorie]['pk'],
+                        1) / 2
                 for id_categorie in scat['cher']:
                     scat['cher'][id_categorie]['mk'] = round(
-                        scat['cher'][id_categorie]['quantite'] / 60 * scat['cher'][id_categorie]['pk'],
-                        2)
+                        2 * scat['cher'][id_categorie]['quantite'] / 60 * scat['cher'][id_categorie]['pk'],
+                        1) / 2
 
     def acces_pour_compte(self, id_compte, code_client):
         """

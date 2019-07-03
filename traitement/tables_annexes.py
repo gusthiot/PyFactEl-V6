@@ -586,7 +586,7 @@ class TablesAnnexes(object):
         if code_client in sommes_livraisons and id_compte in sommes_livraisons[code_client]:
             somme = sommes_livraisons[code_client][id_compte]
             structure = r'''{|l|r|c|r|r|r|}'''
-            legende = r'''Prestations livrées'''
+            legende = r'''Consommables et autres prestations'''
             contenu_prests = ""
             for article in generaux.articles_d3:
                 if article.code_d in somme:
@@ -608,21 +608,17 @@ class TablesAnnexes(object):
                                             'num': no_prestation,
                                             'quantite': "%.1f" % sip['quantite'],
                                             'unite': Latex.echappe_caracteres(sip['unite']),
-                                            'pu': Outils.format_2_dec(sip['pu']),
+                                            'pn': Outils.format_2_dec(sip['pn']),
                                             'montant': Outils.format_2_dec(sip['montant']),
                                             'rabais': Outils.format_2_dec(sip['rabais'])}
                         contenu_prests += r'''
-                            %(num)s - %(nom)s & \hspace{5mm} %(quantite)s & %(unite)s & %(pu)s & %(montant)s
+                            %(num)s - %(nom)s & \hspace{5mm} %(quantite)s & %(unite)s & %(pn)s & %(montant)s
                             & %(rabais)s  \\
                             \hline
                             ''' % dico_prestations
-                    dico_prestations = {'montant_d': Outils.format_2_dec(sco['sommes_cat_m_d'][article.code_d]),
-                                        'rabais_d': Outils.format_2_dec(sco['sommes_cat_r_d'][article.code_d]),
-                                        'montant': Outils.format_2_dec(sco['sommes_cat_m'][article.code_d]),
+                    dico_prestations = {'montant': Outils.format_2_dec(sco['sommes_cat_m'][article.code_d]),
                                         'rabais': Outils.format_2_dec(sco['sommes_cat_r'][article.code_d])}
                     contenu_prests += r'''
-                        \multicolumn{4}{|r|}{Arrondi} & %(montant_d)s & %(rabais_d)s  \\
-                        \hline
                         \multicolumn{4}{|r|}{Total} & %(montant)s & %(rabais)s  \\
                         \hline
                         ''' % dico_prestations
@@ -646,7 +642,7 @@ class TablesAnnexes(object):
         if code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes']:
 
             structure = r'''{|l|c|c|r|r|}'''
-            legende = r'''Procédés (Machine + Main d'œuvre)'''
+            legende = r'''Services'''
             contenu = r'''
                 \hline
                 \textbf{''' + intitule_compte + r'''} & Unité & Quantité & \multicolumn{1}{c|}{PU} &
@@ -710,12 +706,9 @@ class TablesAnnexes(object):
                         \hline
                         ''' % dico_cat
 
-            dico_cat = {'mk_d': Outils.format_2_dec(sco['somme_j_mk_d']),
-                        'mkj': Outils.format_2_dec(sco['somme_j_mk'])}
+            dico_cat = {'mkj': Outils.format_2_dec(sco['somme_j_mk'])}
 
             contenu += r'''
-                \multicolumn{4}{|r|}{Arrondi} & %(mk_d)s \\
-                \hline
                 \multicolumn{4}{|r|}{Total} & %(mkj)s \\
                 \hline
                 ''' % dico_cat
@@ -736,30 +729,33 @@ class TablesAnnexes(object):
         structure = r'''{|l|r|r|r|}'''
         legende = r'''Récapitulatif des articles du projet'''
 
-        dico = {'mm': Outils.format_2_dec(sco['somme_j_mm']), 'mr': Outils.format_2_dec(sco['somme_j_mr']),
-                'mj': Outils.format_2_dec(sco['mj']),
-                'int_proc': Latex.echappe_caracteres(generaux.articles[2].intitule_long)}
-
         contenu = r'''
             \cline{2-4}
             \multicolumn{1}{r|}{} & \multicolumn{1}{c|}{Montant} & \multicolumn{1}{c|}{Rabais}
             & \multicolumn{1}{c|}{Net} \\
-            \hline
-            %(int_proc)s & %(mm)s & %(mr)s & %(mj)s \\
-            \hline
-            ''' % dico
+            \hline'''
+
+        if sco['somme_j_mm'] > 0:
+            dico = {'mm': Outils.format_2_dec(sco['somme_j_mm']), 'mr': Outils.format_2_dec(sco['somme_j_mr']),
+                    'mj': Outils.format_2_dec(sco['mj']),
+                    'int_proc': Latex.echappe_caracteres(generaux.articles[2].intitule_long)}
+            contenu += r'''
+                %(int_proc)s & %(mm)s & %(mr)s & %(mj)s \\
+                \hline
+                ''' % dico
 
         total = sco['mj']
         for article in generaux.articles_d3:
             total += sco['tot_cat'][article.code_d]
-            dico = {'intitule': Latex.echappe_caracteres(article.intitule_long),
-                    'cmj': Outils.format_2_dec(sco['sommes_cat_m'][article.code_d]),
-                    'crj': Outils.format_2_dec(sco['sommes_cat_r'][article.code_d]),
-                    'cj': Outils.format_2_dec(sco['tot_cat'][article.code_d])}
-            contenu += r'''
-            %(intitule)s & %(cmj)s & %(crj)s & %(cj)s \\
-            \hline
-            ''' % dico
+            if sco['sommes_cat_m'][article.code_d]:
+                dico = {'intitule': Latex.echappe_caracteres(article.intitule_long),
+                        'cmj': Outils.format_2_dec(sco['sommes_cat_m'][article.code_d]),
+                        'crj': Outils.format_2_dec(sco['sommes_cat_r'][article.code_d]),
+                        'cj': Outils.format_2_dec(sco['tot_cat'][article.code_d])}
+                contenu += r'''
+                %(intitule)s & %(cmj)s & %(crj)s & %(cj)s \\
+                \hline
+                ''' % dico
 
         contenu += r'''\multicolumn{3}{|r|}{Total} & ''' + Outils.format_2_dec(total) + r'''\\
         \hline

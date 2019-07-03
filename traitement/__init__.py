@@ -9,3 +9,4 @@ from .recapitulatifs import Recapitulatifs
 from .bilan_comptes import BilanComptes
 from .resumes import Resumes
 from .tables_annexes import TablesAnnexes
+from .recaprojet import RecaProjet

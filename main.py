@@ -184,6 +184,7 @@ if pe_present:
     for donnee in paramannexe.donnees:
         donnee['chemin'] = Outils.chemin([dossier_enregistrement, donnee['dossier']], generaux)
         Outils.existe(donnee['chemin'], True)
+        donnee['dossier_pdf'] = DossierDestination(donnee['chemin'])
         donnee['lien'] = Outils.lien_dossier([dossier_lien, donnee['dossier']], generaux)
 
     # faire les annexes avant la facture, que le ticket puisse vérifier leur existence

@@ -1,6 +1,7 @@
 from outils import Outils
 from latex import Latex
 from .tables_annexes import TablesAnnexes
+from .recaprojet import RecaProjet
 import os
 
 
@@ -294,6 +295,11 @@ class Annexes(object):
                     if len(pdfs_annexes[donnee['nom']]) > 1:
                         Latex.concatenation_pdfs(donnee['nom'] + suffixe, pdfs_annexes[donnee['nom']])
                     Latex.finaliser_pdf(donnee['nom'] + suffixe, donnee['chemin'])
+                    if donnee['nom'] == 'Annexe-projets':
+                        lignes = RecaProjet.creation_lignes(edition, sommes.sommes_comptes[code_client], client,
+                                                            generaux, acces, livraisons, comptes, categories)
+                        RecaProjet.recap(donnee['dossier_pdf'], donnee['nom'] + suffixe, lignes)
+
             files = [f for f in os.listdir('.') if os.path.isfile(f)]
             for f in files:
                 if f.endswith('anntemp.pdf'):
