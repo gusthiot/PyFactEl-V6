@@ -650,61 +650,25 @@ class TablesAnnexes(object):
                 \hline
                 '''
 
-            som_cat = sommes_acces[code_client]['categories'][id_compte]['machine']
+            for cat, som_cat in sorted(sommes_acces[code_client]['categories'][id_compte].items()):
 
-            for id_categorie, cats in sorted(som_cat.items()):
-                dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
-                            'pk': Outils.format_2_dec(cats['pk']),
-                            'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
-                            'quantite': Outils.format_heure(cats['quantite']),
-                            'mk': Outils.format_2_dec(cats['mk'])}
-                contenu += r'''
-                    %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
-                    \hline
-                    ''' % dico_cat
-
-            som_cat = sommes_acces[code_client]['categories'][id_compte]['operateur']
-
-            for id_categorie, cats in sorted(som_cat.items()):
-                montant = cats['mk']
-                if montant > 0:
-                    dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
-                                'pk': Outils.format_2_dec(cats['pk']),
-                                'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
-                                'quantite': Outils.format_heure(cats['quantite']),
-                                'mk': Outils.format_2_dec(montant)}
-                    contenu += r'''
-                        %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
-                        \hline
-                        ''' % dico_cat
-
-            som_cat = sommes_acces[code_client]['categories'][id_compte]['plateforme']
-
-            for id_categorie, cats in sorted(som_cat.items()):
-                dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
-                            'pk': Outils.format_2_dec(cats['pk']),
-                            'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
-                            'quantite': cats['quantite'],
-                            'mk': Outils.format_2_dec(cats['mk'])}
-                contenu += r'''
-                    %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
-                    \hline
-                    ''' % dico_cat
-
-            som_cat = sommes_acces[code_client]['categories'][id_compte]['cher']
-
-            for id_categorie, cats in sorted(som_cat.items()):
-                montant = cats['mk']
-                if montant > 0:
-                    dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
-                                'pk': Outils.format_2_dec(cats['pk']),
-                                'unite': Latex.echappe_caracteres(categories.donnees[id_categorie]['unite']),
-                                'quantite': Outils.format_heure(cats['quantite']),
-                                'mk': Outils.format_2_dec(montant)}
-                    contenu += r'''
-                        %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
-                        \hline
-                        ''' % dico_cat
+                for id_categorie, cats in sorted(som_cat.items()):
+                    montant = cats['mk']
+                    unite = categories.donnees[id_categorie]['unite']
+                    if unite == 'hh_mm':
+                        quantite = Outils.format_heure(cats['quantite'])
+                    else:
+                        quantite = cats['quantite']
+                    if montant > 0:
+                        dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
+                                    'pk': Outils.format_2_dec(cats['pk']),
+                                    'unite': Latex.echappe_caracteres(unite),
+                                    'quantite': quantite,
+                                    'mk': Outils.format_2_dec(montant)}
+                        contenu += r'''
+                            %(intitule)s & %(unite)s & %(quantite)s & %(pk)s & %(mk)s  \\
+                            \hline
+                            ''' % dico_cat
 
             dico_cat = {'mkj': Outils.format_2_dec(sco['somme_j_mk'])}
 

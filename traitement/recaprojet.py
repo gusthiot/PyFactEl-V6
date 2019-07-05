@@ -55,35 +55,18 @@ class RecaProjet(object):
 
             if code_client in acces.sommes and id_compte in acces.sommes[code_client]['categories']:
 
-                som_cats = acces.sommes[code_client]['categories'][id_compte]['machine']
-                for id_categorie, som_cat in sorted(som_cats.items()):
-                    ligne = base_compte + ['Services', categories.donnees[id_categorie]['intitule'],
-                                           (som_cat['quantite']/1440), categories.donnees[id_categorie]['unite'],
-                                           som_cat['pk'], som_cat['mk']]
-                    lignes.append(ligne)
-
-                som_cats = acces.sommes[code_client]['categories'][id_compte]['operateur']
-                for id_categorie, som_cat in sorted(som_cats.items()):
-                    if som_cat['mk'] > 0:
-                        ligne = base_compte + ['Services', categories.donnees[id_categorie]['intitule'],
-                                               (som_cat['quantite']/1440), categories.donnees[id_categorie]['unite'],
-                                               som_cat['pk'], som_cat['mk']]
-                        lignes.append(ligne)
-
-                som_cats = acces.sommes[code_client]['categories'][id_compte]['plateforme']
-                for id_categorie, som_cat in sorted(som_cats.items()):
-                    ligne = base_compte + ['Services', categories.donnees[id_categorie]['intitule'],
-                                           som_cat['quantite'], categories.donnees[id_categorie]['unite'],
-                                           som_cat['pk'], som_cat['mk']]
-                    lignes.append(ligne)
-
-                som_cats = acces.sommes[code_client]['categories'][id_compte]['cher']
-                for id_categorie, som_cat in sorted(som_cats.items()):
-                    if som_cat['mk'] > 0:
-                        ligne = base_compte + ['Services', categories.donnees[id_categorie]['intitule'],
-                                               (som_cat['quantite']/1440), categories.donnees[id_categorie]['unite'],
-                                               som_cat['pk'], som_cat['mk']]
-                        lignes.append(ligne)
+                for cat, som_cat in sorted(acces.sommes[code_client]['categories'][id_compte].items()):
+                    for id_categorie, som_cat in sorted(som_cat.items()):
+                        unite = categories.donnees[id_categorie]['unite']
+                        montant = som_cat['mk']
+                        if unite == 'hh_mm':
+                            quantite = som_cat['quantite']/1440
+                        else:
+                            quantite = som_cat['quantite']
+                        if montant > 0:
+                            ligne = base_compte + ['Services', categories.donnees[id_categorie]['intitule'],
+                                                   quantite, unite, som_cat['pk'], montant]
+                            lignes.append(ligne)
 
             if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
                 somme = livraisons.sommes[code_client][id_compte]
