@@ -589,7 +589,7 @@ class TablesAnnexes(object):
             legende = r'''Consommables et autres prestations'''
             contenu_prests = ""
             for article in generaux.articles_d3:
-                if article.code_d in somme:
+                if article.code_d in somme and sco['sommes_cat_m'][article.code_d] > 0:
                     if contenu_prests != "":
                         contenu_prests += r'''
                             \multicolumn{6}{c}{} \\
@@ -604,18 +604,19 @@ class TablesAnnexes(object):
                         \hline
                         '''
                     for no_prestation, sip in sorted(somme[article.code_d].items()):
-                        dico_prestations = {'nom': Latex.echappe_caracteres(sip['nom']),
-                                            'num': no_prestation,
-                                            'quantite': "%.1f" % sip['quantite'],
-                                            'unite': Latex.echappe_caracteres(sip['unite']),
-                                            'pn': Outils.format_2_dec(sip['pn']),
-                                            'montant': Outils.format_2_dec(sip['montant']),
-                                            'rabais': Outils.format_2_dec(sip['rabais'])}
-                        contenu_prests += r'''
-                            %(num)s - %(nom)s & \hspace{5mm} %(quantite)s & %(unite)s & %(pn)s & %(montant)s
-                            & %(rabais)s  \\
-                            \hline
-                            ''' % dico_prestations
+                        if sip['montant'] > 0:
+                            dico_prestations = {'nom': Latex.echappe_caracteres(sip['nom']),
+                                                'num': no_prestation,
+                                                'quantite': "%.1f" % sip['quantite'],
+                                                'unite': Latex.echappe_caracteres(sip['unite']),
+                                                'pn': Outils.format_2_dec(sip['pn']),
+                                                'montant': Outils.format_2_dec(sip['montant']),
+                                                'rabais': Outils.format_2_dec(sip['rabais'])}
+                            contenu_prests += r'''
+                                %(num)s - %(nom)s & \hspace{5mm} %(quantite)s & %(unite)s & %(pn)s & %(montant)s
+                                & %(rabais)s  \\
+                                \hline
+                                ''' % dico_prestations
                     dico_prestations = {'montant': Outils.format_2_dec(sco['sommes_cat_m'][article.code_d]),
                                         'rabais': Outils.format_2_dec(sco['sommes_cat_r'][article.code_d])}
                     contenu_prests += r'''
@@ -639,7 +640,7 @@ class TablesAnnexes(object):
         :return: table au format latex
         """
 
-        if code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes']:
+        if code_client in sommes_acces and id_compte in sommes_acces[code_client]['comptes'] and sco['somme_j_mk'] > 0:
 
             structure = r'''{|l|c|c|r|r|}'''
             legende = r'''Services'''

@@ -11,7 +11,7 @@ class RecaProjet(object):
         """
         création du récapitulatif des projets
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
-        :param edition: paramètres d'édition
+        :param nom: nom du fichier de récapitulation
         :param lignes: lignes de données du détail
         """
 
@@ -55,8 +55,8 @@ class RecaProjet(object):
 
             if code_client in acces.sommes and id_compte in acces.sommes[code_client]['categories']:
 
-                for cat, som_cat in sorted(acces.sommes[code_client]['categories'][id_compte].items()):
-                    for id_categorie, som_cat in sorted(som_cat.items()):
+                for cat, som_cats in sorted(acces.sommes[code_client]['categories'][id_compte].items()):
+                    for id_categorie, som_cat in sorted(som_cats.items()):
                         unite = categories.donnees[id_categorie]['unite']
                         montant = som_cat['mk']
                         if unite == 'hh_mm':
@@ -78,8 +78,9 @@ class RecaProjet(object):
                         else:
                             base_article = base_compte + ['Other']
                         for no_prestation, sip in sorted(somme[article.code_d].items()):
-                            ligne = base_article + [str(no_prestation) + " - " + sip['nom'], sip['quantite'], sip['unite'], sip['pn'],
-                                      (sip['montant'] - sip['rabais'])]
-                            lignes.append(ligne)
+                            if sip['montant'] > 0:
+                                ligne = base_article + [str(no_prestation) + " - " + sip['nom'], sip['quantite'],
+                                                        sip['unite'], sip['pn'], (sip['montant'] - sip['rabais'])]
+                                lignes.append(ligne)
 
         return lignes
