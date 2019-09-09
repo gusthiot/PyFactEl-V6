@@ -49,7 +49,7 @@ class RecaProjet(object):
             ref += "-" + str(edition.version)
         base_client = [generaux.centre, edition.annee, edition.mois, ref, client['code_sap'], client['abrev_labo']]
 
-        for num_compte, id_compte in sorted(comptes_utilises.items()):
+        for id_compte, num_compte in sorted(comptes_utilises.items(), key=lambda x: x[1]):
             compte = comptes.donnees[id_compte]
             base_compte = base_client + [num_compte + " - " + compte['intitule']]
 
