@@ -82,13 +82,14 @@ class Verification(object):
         comptes_actifs = Verification.obtenir_comptes_actifs(acces, livraisons)
         clients_actifs = Verification.obtenir_clients_actifs(comptes_actifs, comptes)
 
-        if (edition.version > 0) and (len(clients_actifs) > 1):
-            Outils.affiche_message("Si version différente de 0, un seul client autorisé")
-            sys.exit("Trop de clients pour version > 0")
-        if (edition.version > 0) and (edition.client_unique != clients_actifs[0]):
-            Outils.affiche_message("Le client unique des paramètres d'édition n'est pas le même que celui présent dans "
+        if edition.version > 0 and len(clients_actifs) > 0:
+            if len(clients_actifs) > 1:
+                Outils.affiche_message("Si version différente de 0, un seul client autorisé")
+                sys.exit("Trop de clients pour version > 0")
+            if edition.client_unique != clients_actifs[0]:
+                Outils.affiche_message("Le client unique des paramètres d'édition n'est pas le même que celui présent dans "
                                    "les transactions")
-            sys.exit("clients non-correspondants pour version > 0")
+                sys.exit("clients non-correspondants pour version > 0")
         self.a_verifier = 0
         return verif
 
