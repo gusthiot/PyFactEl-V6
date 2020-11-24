@@ -136,7 +136,8 @@ class Acces(Fichier):
             sco[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             sco[id_machine]['duree_hc'] += donnee['duree_machine_hc']
             sco[id_machine]['mo'] += donnee['duree_operateur']
-            sco[id_machine]['runs'] += 1
+            if donnee['duree_machine_hp'] > 0 or donnee['duree_machine_hc'] < 0:
+                sco[id_machine]['runs'] += 1
 
             scm = sco[id_machine]['users']
 
